@@ -1,15 +1,59 @@
-﻿public class Casino
+﻿public class Program
 {
-    private int balance = 0;
-    private bool isGameStarts = false;
-    private const int multiplicator = 3;
-    private const int minNum = 18;
+    public static void Main( string[] args )
+    {
+        Casino casino = new();
+        casino.RunCasino();
+    }
+}
+
+public class Casino
+{
+    private int _balance = 0;
+    private bool _isGameStarts = false;
+    private const int Multiplicator = 3;
+    private const int MinNum = 18;
+
+    public void RunCasino()
+    {
+        Console.Write( "Начать (да/нет): " );
+
+        string? answer = Console.ReadLine();
+        if ( answer != null )
+        {
+            answer = answer.ToLower();
+            if ( answer == "да" || answer == "yes" || answer == "y" )
+            {
+                StartGame();
+
+                while ( true )
+                {
+                    Console.Write( "Введите начальный баланс: " );
+                    string? input = Console.ReadLine();
+                    if ( ParseAndSetBalance( input ) )
+                    {
+                        break;
+                    }
+                }
+
+                HandleTitle();
+                HandleMenu();
+
+                while ( _isGameStarts )
+                {
+                    Console.WriteLine();
+                    Console.Write( "Введите команду: " );
+                    ProcessInput();
+                }
+            }
+        }
+    }
 
     private bool ParseAndSetBalance( string? inputBal )
     {
         if ( int.TryParse( inputBal, out int bal ) && bal > 0 )
         {
-            balance = bal;
+            _balance = bal;
             return true;
         }
         else
@@ -23,7 +67,7 @@
     {
         if ( int.TryParse( inputAdd, out int addition ) && addition > 0 )
         {
-            balance += addition;
+            _balance += addition;
             return true;
         }
         else
@@ -35,17 +79,17 @@
 
     private void HandleBalance()
     {
-        Console.WriteLine( $"Ваш баланс: {balance}" );
+        Console.WriteLine( $"Ваш баланс: {_balance}" );
     }
 
     private void StartGame()
     {
-        isGameStarts = true;
+        _isGameStarts = true;
     }
 
     private void EndGame()
     {
-        isGameStarts = false;
+        _isGameStarts = false;
     }
 
     private void HandleTitle()
@@ -77,17 +121,17 @@
         int randomNum = Random.Shared.Next( 1, 21 );
         Console.WriteLine( $"Выпало число: {randomNum}" );
 
-        if ( randomNum >= minNum )
+        if ( randomNum >= MinNum )
         {
-            int winSum = sum * ( 1 + ( multiplicator * ( randomNum % ( minNum - 1 ) ) ) );
+            int winSum = sum * ( 1 + ( Multiplicator * ( randomNum % ( MinNum - 1 ) ) ) );
             Console.WriteLine( $"Вы выиграли!!! Сумма выигрыша: {winSum}" );
-            balance += winSum;
+            _balance += winSum;
             HandleBalance();
         }
         else
         {
             Console.WriteLine( "Вы проиграли..." );
-            balance -= sum;
+            _balance -= sum;
             HandleBalance();
         }
     }
@@ -96,7 +140,7 @@
     {
         if ( int.TryParse( inputBetSum, out int betSum ) )
         {
-            if ( betSum <= balance )
+            if ( betSum <= _balance )
             {
                 if ( betSum > 0 )
                 {
@@ -179,49 +223,5 @@
         {
             Console.WriteLine( "Ошибка: пустой ввод" );
         }
-    }
-
-    public void RunCasino()
-    {
-        Console.Write( "Начать (да/нет): " );
-
-        string? answer = Console.ReadLine();
-        if ( answer != null )
-        {
-            answer = answer.ToLower();
-            if ( answer == "да" || answer == "yes" || answer == "y" )
-            {
-                StartGame();
-
-                while ( true )
-                {
-                    Console.Write( "Введите начальный баланс: " );
-                    string? input = Console.ReadLine();
-                    if ( ParseAndSetBalance( input ) )
-                    {
-                        break;
-                    }
-                }
-
-                HandleTitle();
-                HandleMenu();
-
-                while ( isGameStarts )
-                {
-                    Console.WriteLine();
-                    Console.Write( "Введите команду: " );
-                    ProcessInput();
-                }
-            }
-        }
-    }
-}
-
-public class Program
-{
-    public static void Main( string[] args )
-    {
-        Casino casino = new Casino();
-        casino.RunCasino();
     }
 }
