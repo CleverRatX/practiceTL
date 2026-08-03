@@ -40,20 +40,20 @@
 
     private static int RequestInt( string message )
     {
-        while ( true )
+        int result = 0;
+        bool isParsed = false;
+        while ( !isParsed )
         {
             Console.Write( message );
             string? input = Console.ReadLine();
 
-            if ( int.TryParse( input, out int count ) )
-            {
-                return count;
-            }
-            else
+            isParsed = int.TryParse( input, out result );
+            if ( !isParsed )
             {
                 Console.WriteLine( "Ошибка: Вы ввели не число" );
             }
         }
+        return result;
     }
 
     private static bool AskForConfirm()
