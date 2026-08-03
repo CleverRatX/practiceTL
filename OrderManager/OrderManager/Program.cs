@@ -1,5 +1,7 @@
 ﻿public class Program
 {
+    private static readonly HashSet<string> _agreeAnswers = [ "да", "yes", "y" ];
+
     public static void Main( string[] args )
     {
         string product = RequestString( "Введите название товара: " );
@@ -8,14 +10,9 @@
         string address = RequestString( "Введите адрес доставки: " );
 
         Console.WriteLine( $"Здравствуйте, {name}, вы заказали {count} {product} на адрес {address}, все верно?" );
-        string? answer = Console.ReadLine();
+        bool answer = AskForConfirm();
 
-        if ( answer != null )
-        {
-            answer = answer.ToLower();
-        }
-
-        if ( answer == "да" || answer == "yes" || answer == "y" )
+        if ( answer )
         {
             DateTime deliveryDate = DateTime.Now.AddDays( 3 );
             Console.WriteLine( $"{name}! Ваш заказ {product} в количестве {count} оформлен! Ожидайте доставку по адресу {address} к {deliveryDate:dd.MM.yyyy}" );
@@ -28,12 +25,13 @@
 
     private static string RequestString( string message )
     {
-        Console.WriteLine( message );
+        Console.Write( message );
         string? input = Console.ReadLine();
 
-        while ( input == null )
+        while ( string.IsNullOrWhiteSpace( input ) )
         {
             Console.WriteLine( "Ошибка: Ввод не должен быть пустым" );
+            Console.Write( message );
             input = Console.ReadLine();
         }
 
@@ -44,7 +42,7 @@
     {
         while ( true )
         {
-            Console.WriteLine( message );
+            Console.Write( message );
             string? input = Console.ReadLine();
 
             if ( int.TryParse( input, out int count ) )
@@ -56,5 +54,20 @@
                 Console.WriteLine( "Ошибка: Вы ввели не число" );
             }
         }
+    }
+
+    private static bool AskForConfirm()
+    {
+        string? answer = Console.ReadLine();
+
+        if ( !string.IsNullOrWhiteSpace( answer ) )
+        {
+            answer = answer.ToLower();
+            if ( _agreeAnswers.Contains( answer ) )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
