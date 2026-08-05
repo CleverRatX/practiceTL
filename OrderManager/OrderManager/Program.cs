@@ -10,9 +10,9 @@
         string address = RequestString( "Введите адрес доставки: " );
 
         Console.WriteLine( $"Здравствуйте, {name}, вы заказали {count} {product} на адрес {address}, все верно?" );
-        bool answer = AskForConfirm();
+        bool isAgree = AskForAgreement();
 
-        if ( answer )
+        if ( isAgree )
         {
             DateTime deliveryDate = DateTime.Now.AddDays( 3 );
             Console.WriteLine( $"{name}! Ваш заказ {product} в количестве {count} оформлен! Ожидайте доставку по адресу {address} к {deliveryDate:dd.MM.yyyy}" );
@@ -56,7 +56,7 @@
         return result;
     }
 
-    private static bool AskForConfirm()
+    private static bool AskForAgreement()
     {
         string? answer = Console.ReadLine();
 
