@@ -10,11 +10,26 @@
 public class Casino
 {
     private int _balance = 0;
-    private bool _isGameStarts = true;
+    private bool _isPlayed = true;
     private const int Multiplicator = 3;
     private const int MinNum = 18;
 
     public void RunCasino()
+    {
+        AskForStartBalance();
+
+        PrintTitle();
+        PrintMenu();
+
+        while ( _isPlayed )
+        {
+            Console.WriteLine();
+            Console.Write( "Введите команду: " );
+            HandleInput();
+        }
+    }
+
+    private void AskForStartBalance()
     {
         bool askingForBalance = true;
         while ( askingForBalance )
@@ -25,16 +40,6 @@ public class Casino
             {
                 askingForBalance = false;
             }
-        }
-
-        PrintTitle();
-        PrintMenu();
-
-        while ( _isGameStarts )
-        {
-            Console.WriteLine();
-            Console.Write( "Введите команду: " );
-            HandleInput();
         }
     }
 
@@ -68,7 +73,7 @@ public class Casino
 
     private void EndGame()
     {
-        _isGameStarts = false;
+        _isPlayed = false;
     }
 
     private void PrintBalance()
