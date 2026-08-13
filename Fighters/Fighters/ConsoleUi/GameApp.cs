@@ -1,4 +1,5 @@
 ﻿using Fighters.Fight;
+using Fighters.Models;
 using Fighters.Models.Armors;
 using Fighters.Models.FighterClasses;
 using Fighters.Models.Fighters;
@@ -9,39 +10,19 @@ namespace Fighters.ConsoleUi
 {
     public class GameApp
     {
-        private static readonly List<IRace> _races = new()
-        {
-            new Human(),
-            new Orc(),
-            new Vampire()
-        };
-
-        private static readonly List<IFighterClass> _classes = new()
-        {
-            new Knight(),
-            new Mercenary()
-        };
-
-        private static readonly List<IWeapon> _weapons = new()
-        {
-            new Fists(),
-            new Sword(),
-            new Spear()
-        };
-
-        private static readonly List<IArmor> _armors = new()
-        {
-            new NoArmor(),
-            new Chainmail(),
-            new Plate()
-        };
+        private const string AddFighterCommand = "add-fighter";
+        private const string ListCommand = "list";
+        private const string PlayCommand = "play";
+        private const string ClearCommand = "clear";
+        private const string HelpCommand = "help";
+        private const string ExitCommand = "exit";
 
         private readonly List<IFighter> _fighters = new();
         private readonly FightManager _fightManager;
 
         public GameApp( FightManager fightManager )
         {
-            _fightManager = fightManager ?? throw new ArgumentNullException( nameof( fightManager ) );
+            _fightManager = fightManager;
         }
 
         public void Run()
@@ -54,23 +35,27 @@ namespace Fighters.ConsoleUi
             while ( isRunning )
             {
                 Console.WriteLine();
-                string command = ConsoleInput.ReadNotEmptyString( "Введите команду:" ).ToLowerInvariant();
+
+                string command = ConsoleInput.ReadString( "Введите команду:" ).ToLowerInvariant();
 
                 switch ( command )
                 {
-                    case "add-fighter":
+                    case AddFighterCommand:
                         AddFighter();
                         break;
-                    case "list":
+                    case ListCommand:
                         PrintFighters();
                         break;
-                    case "play":
+                    case PlayCommand:
                         Play();
                         break;
-                    case "help":
+                    case ClearCommand:
+                        ClearArena();
+                        break;
+                    case HelpCommand:
                         PrintCommands();
                         break;
-                    case "exit":
+                    case ExitCommand:
                         isRunning = false;
                         break;
                     default:
@@ -79,41 +64,38 @@ namespace Fighters.ConsoleUi
                         break;
                 }
             }
-
-            Console.WriteLine( "До новых боёв!" );
         }
 
         private void AddFighter()
         {
-            string name = ConsoleInput.ReadNotEmptyString( "Введите имя персонажа:" );
+            string name = ConsoleInput.ReadString( "Введите имя персонажа:" );
 
-            List<string> raceNames = _races.Select( race => race.Name ).ToList();
-            int raceIndex = ConsoleInput.ChooseIndex( "Выберите расу из списка ниже:", raceNames );
+            IRace race = ChooseOne( "Выберите расу из списка ниже:", FighterCatalog.Races, item => item.Name );
+            IFighterClass fighterClass = ChooseOne( "Выберите класс из списка ниже:", FighterCatalog.Classes, item => item.Name );
+            IWeapon weapon = ChooseOne( "Выберите оружие из списка ниже:", FighterCatalog.Weapons, item => item.Name );
+            IArmor armor = ChooseOne( "Выберите броню из списка ниже:", FighterCatalog.Armors, item => item.Name );
 
-            List<string> classNames = _classes.Select( fighterClass => fighterClass.Name ).ToList();
-            int classIndex = ConsoleInput.ChooseIndex( "Выберите класс из списка ниже:", classNames );
-
-            List<string> weaponNames = _weapons.Select( weapon => weapon.Name ).ToList();
-            int weaponIndex = ConsoleInput.ChooseIndex( "Выберите оружие из списка ниже:", weaponNames );
-
-            List<string> armorNames = _armors.Select( armor => armor.Name ).ToList();
-            int armorIndex = ConsoleInput.ChooseIndex( "Выберите броню из списка ниже:", armorNames );
-
-            Fighter fighter = new( name, _races[ raceIndex ], _classes[ classIndex ] );
-            fighter.SetWeapon( _weapons[ weaponIndex ] );
-            fighter.SetArmor( _armors[ armorIndex ] );
-
+            Fighter fighter = new( name, race, fighterClass, weapon, armor );
             _fighters.Add( fighter );
 
             Console.WriteLine( "Боец добавлен на арену:" );
             PrintFighter( fighter );
         }
 
+        private static T ChooseOne<T>( string title, IReadOnlyList<T> options, Func<T, string> getName )
+        {
+            List<string> names = options
+                .Select( getName )
+                .ToList();
+
+            return options[ ConsoleInput.ChooseOption( title, names ) ];
+        }
+
         private void PrintFighters()
         {
             if ( _fighters.Count == 0 )
             {
-                Console.WriteLine( "На арене пока никого нет, добавьте бойца командой add-fighter." );
+                Console.WriteLine( $"На арене пока никого нет, добавьте бойца командой {AddFighterCommand}." );
                 return;
             }
 
@@ -129,7 +111,7 @@ namespace Fighters.ConsoleUi
         {
             if ( _fighters.Count < 2 )
             {
-                Console.WriteLine( "Для боя нужно минимум два бойца, добавьте их командой add-fighter." );
+                Console.WriteLine( $"Для боя нужно минимум два бойца, добавьте их командой {AddFighterCommand}." );
                 return;
             }
 
@@ -139,9 +121,24 @@ namespace Fighters.ConsoleUi
             FightReport fightReport = _fightManager.Fight( _fighters );
             PrintFightReport( fightReport );
 
-            _fighters.Clear();
+            RestoreFighters();
+        }
+
+        private void RestoreFighters()
+        {
+            foreach ( IFighter fighter in _fighters )
+            {
+                fighter.RestoreHealth();
+            }
 
             Console.WriteLine();
+            Console.WriteLine( $"Бойцы залечили раны и остались на арене. Команда {ClearCommand} — очистить арену." );
+        }
+
+        private void ClearArena()
+        {
+            _fighters.Clear();
+
             Console.WriteLine( "Арена очищена, можно набирать новых бойцов." );
         }
 
@@ -150,7 +147,7 @@ namespace Fighters.ConsoleUi
             foreach ( RoundReport round in fightReport.Rounds )
             {
                 Console.WriteLine();
-                Console.WriteLine( $" --- Раунд {round.Number} --- " );
+                Console.WriteLine( $"--- Раунд {round.Number} ---" );
 
                 foreach ( AttackReport attack in round.Attacks )
                 {
@@ -164,13 +161,16 @@ namespace Fighters.ConsoleUi
         private static void PrintAttack( AttackReport attack )
         {
             string criticalText = attack.IsCritical ? " Крит!" : string.Empty;
+            string blockedText = attack.RawDamage > attack.DealtDamage
+                ? $" Броня погасила {attack.RawDamage - attack.DealtDamage}."
+                : string.Empty;
 
-            Console.WriteLine( $"{attack.Attacking.Name} наносит {attack.Damage} урона бойцу {attack.Attacked.Name}.{criticalText} " +
-                $"У бойца {attack.Attacked.Name} осталось {attack.AttackedHealthLeft} здоровья" );
+            Console.WriteLine( $"{attack.AttackingName} наносит {attack.DealtDamage} урона бойцу {attack.AttackedName}.{criticalText}{blockedText} " +
+                $"У бойца {attack.AttackedName} осталось {attack.AttackedHealthLeft} здоровья" );
 
             if ( attack.IsAttackedDefeated )
             {
-                Console.WriteLine( $"{attack.Attacked.Name} погибает!" );
+                Console.WriteLine( $"{attack.AttackedName} погибает!" );
             }
         }
 
@@ -180,29 +180,30 @@ namespace Fighters.ConsoleUi
 
             if ( fightReport.Winner is null )
             {
-                Console.WriteLine( "Бой окончен. Ничья" );
+                Console.WriteLine( "Бой окончен. Ничья." );
                 return;
             }
 
-            Console.WriteLine( $"Бой окончен. {fightReport.Winner.Name} остаётся последним на арене и побеждает! " +
-                $"Здоровья осталось: {fightReport.Winner.GetCurrentHealth()}" );
+            Console.WriteLine( $"Бой окончен. {fightReport.Winner.Name} остаётся последним и побеждает! " +
+                $"Здоровья осталось: {fightReport.Winner.CurrentHealth}" );
         }
 
         private static void PrintFighter( IFighter fighter )
         {
-            Console.WriteLine( $"  {fighter.Name}: здоровье {fighter.GetCurrentHealth()}/{fighter.GetMaxHealth()}, " +
-                $"урон {fighter.GetBasicDamage()}, броня {fighter.GetArmor()}, инициатива {fighter.GetInitiative()}, " +
-                $"шанс крита {fighter.GetCritChance() * 100:0}%" );
+            Console.WriteLine( $"  {fighter.Name} - {fighter.RaceName}, {fighter.ClassName}, {fighter.WeaponName}, {fighter.ArmorName}" );
+            Console.WriteLine( $"    здоровье {fighter.CurrentHealth}/{fighter.MaxHealth}, урон {fighter.Damage}, броня {fighter.Armor}, " +
+                $"инициатива {fighter.Initiative}, шанс крита {fighter.CritChance * 100:0}%" );
         }
 
         private static void PrintCommands()
         {
             Console.WriteLine( "Доступные команды:" );
-            Console.WriteLine( "  add-fighter - добавить нового бойца на арену" );
-            Console.WriteLine( "  list - показать бойцов на арене" );
-            Console.WriteLine( "  play - начать битву" );
-            Console.WriteLine( "  help - показать список команд" );
-            Console.WriteLine( "  exit - выйти из игры" );
+            Console.WriteLine( $"  {AddFighterCommand} - добавить нового бойца на арену" );
+            Console.WriteLine( $"  {ListCommand} - показать бойцов на арене" );
+            Console.WriteLine( $"  {PlayCommand} - начать битву" );
+            Console.WriteLine( $"  {ClearCommand} - убрать всех бойцов с арены" );
+            Console.WriteLine( $"  {HelpCommand} - показать список команд" );
+            Console.WriteLine( $"  {ExitCommand} - выйти из игры" );
         }
     }
 }

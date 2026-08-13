@@ -1,10 +1,10 @@
-﻿namespace Fighters.Models.Weapons
+namespace Fighters.Models.Weapons
 {
     public class Sword : IWeapon
     {
-        public string Name => "Меч";
-        public int Damage => 20;
-        public float CritChance => 0.15f;
-        public float CritDamage => 0.50f;
+        public string Name { get; } = "Меч";
+        public int Damage { get; } = 20;
+        public float CritChance { get; } = 0.15f;
+        public float CritDamage { get; } = 0.50f;
     }
 }

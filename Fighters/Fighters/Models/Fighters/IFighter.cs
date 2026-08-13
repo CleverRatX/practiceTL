@@ -1,23 +1,23 @@
-﻿using Fighters.Models.Armors;
-using Fighters.Models.Weapons;
-
 namespace Fighters.Models.Fighters
 {
     public interface IFighter
     {
         string Name { get; }
+        string RaceName { get; }
+        string ClassName { get; }
+        string WeaponName { get; }
+        string ArmorName { get; }
 
-        public int GetMaxHealth();
-        public int GetCurrentHealth();
-        public int GetBasicDamage();
-        public int GetArmor();
-        public int GetInitiative();
-        public float GetCritChance();
-        public float GetCritDamageMultiplier();
+        int MaxHealth { get; }
+        int CurrentHealth { get; }
+        int Damage { get; }
+        int Armor { get; }
+        int Initiative { get; }
+        float CritChance { get; }
+        float CritDamageMultiplier { get; }
+        bool IsAlive { get; }
 
-        public void SetArmor( IArmor armor );
-        public void SetWeapon( IWeapon weapon );
-
-        public void TakeDamage( int damage );
+        void TakeDamage( int damage );
+        void RestoreHealth();
     }
 }

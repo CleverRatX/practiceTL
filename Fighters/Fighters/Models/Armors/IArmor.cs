@@ -1,10 +1,10 @@
-﻿namespace Fighters.Models.Armors
+namespace Fighters.Models.Armors
 {
     public interface IArmor
     {
-        public string Name { get; }
-        public int Armor { get; }
-        public float CritChanceBonus { get; }
-        public int InitiativeBonus { get; }
+        string Name { get; }
+        int Armor { get; }
+        int Initiative { get; }
+        float CritChance { get; }
     }
 }

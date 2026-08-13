@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using Fighters.Utils;
 using Fighters.ConsoleUi;
 using Fighters.Fight;
 
@@ -8,8 +8,6 @@ namespace Fighters
     {
         public static void Main()
         {
-            Console.OutputEncoding = Encoding.UTF8;
-
             IRandomProvider randomProvider = new RandomProvider();
             AttackManager attackManager = new( randomProvider );
             FightManager fightManager = new( attackManager, randomProvider );

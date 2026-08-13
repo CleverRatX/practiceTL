@@ -1,10 +1,10 @@
-﻿namespace Fighters.Models.Armors
+namespace Fighters.Models.Armors
 {
     public class Plate : IArmor
     {
-        public string Name => "Пластинчатая броня";
-        public int Armor => 10;
-        public float CritChanceBonus => -0.05f;
-        public int InitiativeBonus => -4;
+        public string Name { get; } = "Пластинчатая броня";
+        public int Armor { get; } = 10;
+        public int Initiative { get; } = -4;
+        public float CritChance { get; } = -0.05f;
     }
 }

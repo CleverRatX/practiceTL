@@ -1,4 +1,4 @@
-﻿using Fighters.Models.Armors;
+using Fighters.Models.Armors;
 using Fighters.Models.FighterClasses;
 using Fighters.Models.Races;
 using Fighters.Models.Weapons;
@@ -7,14 +7,14 @@ namespace Fighters.Models.Fighters
 {
     public class Fighter : IFighter
     {
-        public string Name { get; }
         private readonly IRace _race;
         private readonly IFighterClass _class;
-        private IArmor _armor = new NoArmor();
-        private IWeapon _weapon = new Fists();
+        private readonly IWeapon _weapon;
+        private readonly IArmor _armor;
+
         private int _currentHealth;
 
-        public Fighter( string name, IRace race, IFighterClass fighterClass )
+        public Fighter( string name, IRace race, IFighterClass fighterClass, IWeapon weapon, IArmor armor )
         {
             if ( string.IsNullOrWhiteSpace( name ) )
             {
@@ -22,55 +22,53 @@ namespace Fighters.Models.Fighters
             }
 
             Name = name;
-            _race = race ?? throw new ArgumentNullException( nameof( race ) );
-            _class = fighterClass ?? throw new ArgumentNullException( nameof( fighterClass ) );
+            _race = race;
+            _class = fighterClass;
+            _weapon = weapon;
+            _armor = armor;
 
-            _currentHealth = GetMaxHealth();
+            _currentHealth = MaxHealth;
         }
 
-        public int GetMaxHealth() => _race.Health + _class.HealthBonus;
+        public string Name { get; }
 
-        public int GetCurrentHealth() => _currentHealth;
+        public string RaceName => _race.Name;
 
-        public int GetBasicDamage() => _weapon.Damage + _race.Strength + _class.DamageBonus;
+        public string ClassName => _class.Name;
 
-        public int GetArmor() => _armor.Armor + _race.Armor;
+        public string WeaponName => _weapon.Name;
 
-        public int GetInitiative() => _race.Initiative + _class.InitiativeBonus + _armor.InitiativeBonus;
+        public string ArmorName => _armor.Name;
 
-        public float GetCritChance()
-        {
-            float baseCritChance = _weapon.CritChance + _class.CritChanceBonus + _armor.CritChanceBonus;
-            return Math.Clamp( baseCritChance, 0f, 1f );
-        }
+        public int MaxHealth => _race.Health + _class.Health;
 
-        public float GetCritDamageMultiplier() => 1 + _weapon.CritDamage + _class.CritDamageBonus;
+        public int CurrentHealth => _currentHealth;
 
-        public void SetArmor( IArmor armor )
-        {
-            _armor = armor ?? throw new ArgumentNullException( nameof( armor ) );
-        }
+        public int Damage => _race.Damage + _class.Damage + _weapon.Damage;
 
-        public void SetWeapon( IWeapon weapon )
-        {
-            _weapon = weapon ?? throw new ArgumentNullException( nameof( weapon ) );
-        }
+        public int Armor => _race.Armor + _armor.Armor;
+
+        public int Initiative => _race.Initiative + _class.Initiative + _armor.Initiative;
+
+        public float CritChance => Math.Clamp( _class.CritChance + _weapon.CritChance + _armor.CritChance, 0f, 1f );
+
+        public float CritDamageMultiplier => 1f + _class.CritDamage + _weapon.CritDamage;
+
+        public bool IsAlive => _currentHealth > 0;
 
         public void TakeDamage( int damage )
         {
-            if ( damage < 0 )
+            if ( damage <= 0 )
             {
-                damage = 0;
+                return;
             }
 
-            int newHealth = _currentHealth - damage;
+            _currentHealth = Math.Max( _currentHealth - damage, 0 );
+        }
 
-            if ( newHealth < 0 )
-            {
-                newHealth = 0;
-            }
-
-            _currentHealth = newHealth;
+        public void RestoreHealth()
+        {
+            _currentHealth = MaxHealth;
         }
     }
 }

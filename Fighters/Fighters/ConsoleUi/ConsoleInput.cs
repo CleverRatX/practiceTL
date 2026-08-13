@@ -2,31 +2,23 @@
 {
     public static class ConsoleInput
     {
-        public static string ReadNotEmptyString( string title )
+        public static string ReadString( string title )
         {
             Console.WriteLine( title );
 
-            string input = "";
-            bool isReading = true;
+            string? input = Console.ReadLine()?.Trim();
 
-            while ( isReading )
+            while ( string.IsNullOrWhiteSpace( input ) )
             {
-                input = Console.ReadLine()?.Trim() ?? string.Empty;
+                Console.WriteLine( "Значение не может быть пустым, попробуйте ещё раз:" );
 
-                if ( !string.IsNullOrWhiteSpace( input ) )
-                {
-                    isReading = false;
-                }
-                else
-                {
-                    Console.WriteLine( "Значение не может быть пустым, попробуйте ещё раз:" );
-                }
+                input = Console.ReadLine()?.Trim();
             }
 
             return input;
         }
 
-        public static int ChooseIndex( string title, List<string> options )
+        public static int ChooseOption( string title, List<string> options )
         {
             Console.WriteLine( title );
 
@@ -35,14 +27,14 @@
                 Console.WriteLine( $"  {i} - {options[ i ]}" );
             }
 
-            int index = 0;
+            int option = 0;
             bool isChoosing = true;
 
             while ( isChoosing )
             {
-                string input = Console.ReadLine()?.Trim() ?? string.Empty;
+                string? input = Console.ReadLine()?.Trim();
 
-                if ( int.TryParse( input, out index ) && ( index >= 0 ) && ( index < options.Count ) )
+                if ( int.TryParse( input, out option ) && option >= 0 && option < options.Count )
                 {
                     isChoosing = false;
                 }
@@ -52,7 +44,7 @@
                 }
             }
 
-            return index;
+            return option;
         }
     }
 }

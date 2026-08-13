@@ -1,14 +1,16 @@
-﻿namespace Fighters.Fight
+namespace Fighters.Fight
 {
     public readonly struct AttackResult
     {
-        public int Damage { get; }
-        public bool IsCritical { get; }
-
-        public AttackResult( int damage, bool isCritical )
+        public AttackResult( int rawDamage, int dealtDamage, bool isCritical )
         {
-            Damage = damage;
+            RawDamage = rawDamage;
+            DealtDamage = dealtDamage;
             IsCritical = isCritical;
         }
+
+        public int RawDamage { get; }
+        public int DealtDamage { get; }
+        public bool IsCritical { get; }
     }
 }

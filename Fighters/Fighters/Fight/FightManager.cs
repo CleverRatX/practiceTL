@@ -1,5 +1,5 @@
-﻿using Fighters.Extensions;
 using Fighters.Models.Fighters;
+using Fighters.Utils;
 
 namespace Fighters.Fight
 {
@@ -12,48 +12,46 @@ namespace Fighters.Fight
 
         public FightManager( AttackManager attackManager, IRandomProvider random )
         {
-            _attackManager = attackManager ?? throw new ArgumentNullException( nameof( attackManager ) );
-            _random = random ?? throw new ArgumentNullException( nameof( random ) );
+            _attackManager = attackManager;
+            _random = random;
         }
 
         public FightReport Fight( List<IFighter> fighters )
         {
-            ArgumentNullException.ThrowIfNull( fighters );
-
             if ( fighters.Count < 2 )
             {
-                throw new ArgumentException( "Ошибка: для боя нужно минимум два бойца.", nameof( fighters ) );
+                throw new ArgumentException( "Для боя нужно минимум два бойца.", nameof( fighters ) );
             }
+
+            List<IFighter> attackOrder = fighters
+                .OrderByDescending( fighter => fighter.Initiative )
+                .ToList();
 
             List<RoundReport> rounds = new();
             int roundNumber = 1;
 
-            while ( ( GetAliveFighters( fighters ).Count > 1 ) && ( roundNumber <= MaxRoundsCount ) )
+            while ( GetAliveCount( attackOrder ) > 1 && roundNumber <= MaxRoundsCount )
             {
-                rounds.Add( PlayRound( fighters, roundNumber ) );
+                rounds.Add( PlayRound( attackOrder, roundNumber ) );
                 roundNumber++;
             }
 
-            return new FightReport( rounds, GetWinner( fighters ) );
+            return new FightReport( rounds, GetWinner( attackOrder ) );
         }
 
-        private RoundReport PlayRound( List<IFighter> fighters, int roundNumber )
+        private RoundReport PlayRound( List<IFighter> attackOrder, int roundNumber )
         {
             List<AttackReport> attacks = new();
 
-            List<IFighter> attackOrder = GetAliveFighters( fighters )
-                .OrderByDescending( fighter => fighter.GetInitiative() )
-                .ToList();
-
             foreach ( IFighter attacking in attackOrder )
             {
-                if ( !attacking.IsAlive() )
+                if ( !attacking.IsAlive )
                 {
                     continue;
                 }
 
-                List<IFighter> targets = fighters
-                    .Where( fighter => ( fighter != attacking ) && fighter.IsAlive() )
+                List<IFighter> targets = attackOrder
+                    .Where( fighter => fighter != attacking && fighter.IsAlive )
                     .ToList();
 
                 if ( targets.Count == 0 )
@@ -65,11 +63,12 @@ namespace Fighters.Fight
                 AttackResult attackResult = _attackManager.Attack( attacking, attacked );
 
                 attacks.Add( new AttackReport(
-                    attacking,
-                    attacked,
-                    attackResult.Damage,
+                    attacking.Name,
+                    attacked.Name,
+                    attackResult.RawDamage,
+                    attackResult.DealtDamage,
                     attackResult.IsCritical,
-                    attacked.GetCurrentHealth() ) );
+                    attacked.CurrentHealth ) );
             }
 
             return new RoundReport( roundNumber, attacks );
@@ -77,18 +76,18 @@ namespace Fighters.Fight
 
         private static IFighter? GetWinner( List<IFighter> fighters )
         {
-            List<IFighter> aliveFighters = GetAliveFighters( fighters );
+            List<IFighter> aliveFighters = fighters
+                .Where( fighter => fighter.IsAlive )
+                .ToList();
 
             return aliveFighters.Count == 1
                 ? aliveFighters[ 0 ]
                 : null;
         }
 
-        private static List<IFighter> GetAliveFighters( List<IFighter> fighters )
+        private static int GetAliveCount( List<IFighter> fighters )
         {
-            return fighters
-                .Where( fighter => fighter.IsAlive() )
-                .ToList();
+            return fighters.Count( fighter => fighter.IsAlive );
         }
     }
 }

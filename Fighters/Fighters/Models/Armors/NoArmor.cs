@@ -1,10 +1,10 @@
-﻿namespace Fighters.Models.Armors
+namespace Fighters.Models.Armors
 {
     public class NoArmor : IArmor
     {
-        public string Name => "Без брони";
-        public int Armor => 0;
-        public float CritChanceBonus => 0.05f;
-        public int InitiativeBonus => 8;
+        public string Name { get; } = "Без брони";
+        public int Armor { get; } = 0;
+        public int Initiative { get; } = 8;
+        public float CritChance { get; } = 0.05f;
     }
 }

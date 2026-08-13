@@ -1,12 +1,12 @@
-﻿namespace Fighters.Models.FighterClasses
+namespace Fighters.Models.FighterClasses
 {
     public class Knight : IFighterClass
     {
-        public string Name => "Рыцарь";
-        public float CritChanceBonus => 0f;
-        public float CritDamageBonus => 0.10f;
-        public int HealthBonus => 60;
-        public int DamageBonus => 10;
-        public int InitiativeBonus => 10;
+        public string Name { get; } = "Рыцарь";
+        public int Health { get; } = 60;
+        public int Damage { get; } = 10;
+        public int Initiative { get; } = 10;
+        public float CritChance { get; } = 0f;
+        public float CritDamage { get; } = 0.10f;
     }
 }

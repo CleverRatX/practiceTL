@@ -1,10 +1,10 @@
-﻿namespace Fighters.Models.Armors
+namespace Fighters.Models.Armors
 {
     public class Chainmail : IArmor
     {
-        public string Name => "Кольчужная броня";
-        public int Armor => 5;
-        public float CritChanceBonus => 0f;
-        public int InitiativeBonus => 2;
+        public string Name { get; } = "Кольчужная броня";
+        public int Armor { get; } = 5;
+        public int Initiative { get; } = 2;
+        public float CritChance { get; } = 0f;
     }
 }

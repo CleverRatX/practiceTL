@@ -1,51 +1,44 @@
-﻿using Fighters.Models.Fighters;
+using Fighters.Models.Fighters;
+using Fighters.Utils;
 
 namespace Fighters.Fight
 {
     public class AttackManager
     {
+        private const float MinScatterMultiplier = 0.8f;
+        private const float MaxScatterMultiplier = 1.2f;
+
         private readonly IRandomProvider _random;
+
         public AttackManager( IRandomProvider random )
         {
-            _random = random ?? throw new ArgumentNullException( nameof( random ) );
+            _random = random;
         }
 
         public AttackResult Attack( IFighter attacking, IFighter attacked )
         {
-            AttackResult attack = CalculateAttack( attacking, attacked );
-            attacked.TakeDamage( attack.Damage );
-            return attack;
+            AttackResult result = CalculateAttack( attacking, attacked );
+            attacked.TakeDamage( result.DealtDamage );
+
+            return result;
         }
 
         private AttackResult CalculateAttack( IFighter attacking, IFighter attacked )
         {
-            ArgumentNullException.ThrowIfNull( attacking );
-            ArgumentNullException.ThrowIfNull( attacked );
+            float damage = attacking.Damage;
+            bool isCritical = _random.NextFloat() <= attacking.CritChance;
 
-            float randomNum = ( float )_random.Next( 1, 101 ) / 100f;
-            float scatterMultiplier = 1f + ( ( float )_random.Next( -20, 21 ) / 100f );
-            bool isCritical;
-            float damage;
-            if ( randomNum <= attacking.GetCritChance() )
+            if ( isCritical )
             {
-                damage = attacking.GetBasicDamage() * attacking.GetCritDamageMultiplier();
-                isCritical = true;
-            }
-            else
-            {
-                damage = attacking.GetBasicDamage();
-                isCritical = false;
+                damage *= attacking.CritDamageMultiplier;
             }
 
-            damage = damage * scatterMultiplier - attacked.GetArmor();
+            float scatterMultiplier = MinScatterMultiplier + ( _random.NextFloat() * ( MaxScatterMultiplier - MinScatterMultiplier ) );
 
-            if ( damage < 0 )
-            {
-                damage = 0;
-            }
+            int rawDamage = ( int )( damage * scatterMultiplier );
+            int dealtDamage = Math.Max( rawDamage - attacked.Armor, 0 );
 
-            AttackResult result = new( ( int )damage, isCritical );
-            return result;
+            return new AttackResult( rawDamage, dealtDamage, isCritical );
         }
     }
 }

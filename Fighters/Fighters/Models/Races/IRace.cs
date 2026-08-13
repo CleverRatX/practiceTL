@@ -1,11 +1,11 @@
-﻿namespace Fighters.Models.Races
+namespace Fighters.Models.Races
 {
     public interface IRace
     {
-        public string Name { get; }
-        public int Strength { get; }
-        public int Health { get; }
-        public int Armor { get; }
-        public int Initiative { get; }
+        string Name { get; }
+        int Health { get; }
+        int Damage { get; }
+        int Armor { get; }
+        int Initiative { get; }
     }
 }
