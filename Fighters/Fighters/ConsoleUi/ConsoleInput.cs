@@ -18,7 +18,7 @@
             return input;
         }
 
-        public static int ChooseOption( string title, List<string> options )
+        public static int ChooseOption( string title, IReadOnlyList<string> options )
         {
             Console.WriteLine( title );
 
