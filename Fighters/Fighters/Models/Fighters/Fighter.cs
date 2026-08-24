@@ -21,6 +21,11 @@ namespace Fighters.Models.Fighters
                 throw new ArgumentException( "Имя бойца не может быть пустым.", nameof( name ) );
             }
 
+            ArgumentNullException.ThrowIfNull( race );
+            ArgumentNullException.ThrowIfNull( fighterClass );
+            ArgumentNullException.ThrowIfNull( weapon );
+            ArgumentNullException.ThrowIfNull( armor );
+
             Name = name;
             _race = race;
             _class = fighterClass;

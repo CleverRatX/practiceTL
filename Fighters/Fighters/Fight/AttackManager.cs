@@ -3,20 +3,30 @@ using Fighters.Utils;
 
 namespace Fighters.Fight
 {
-    public class AttackManager
+    public interface IAttackManager
     {
-        private const float MinScatterMultiplier = 0.8f;
-        private const float MaxScatterMultiplier = 1.2f;
+        AttackResult Attack( IFighter attacking, IFighter attacked );
+    }
+
+    public class AttackManager : IAttackManager
+    {
+        public const float MinScatterMultiplier = 0.8f;
+        public const float MaxScatterMultiplier = 1.2f;
 
         private readonly IRandomProvider _random;
 
         public AttackManager( IRandomProvider random )
         {
+            ArgumentNullException.ThrowIfNull( random );
+
             _random = random;
         }
 
         public AttackResult Attack( IFighter attacking, IFighter attacked )
         {
+            ArgumentNullException.ThrowIfNull( attacking );
+            ArgumentNullException.ThrowIfNull( attacked );
+
             AttackResult result = CalculateAttack( attacking, attacked );
             attacked.TakeDamage( result.DealtDamage );
 
@@ -26,7 +36,7 @@ namespace Fighters.Fight
         private AttackResult CalculateAttack( IFighter attacking, IFighter attacked )
         {
             float damage = attacking.Damage;
-            bool isCritical = _random.NextFloat() <= attacking.CritChance;
+            bool isCritical = _random.NextFloat() < attacking.CritChance;
 
             if ( isCritical )
             {
