@@ -12,7 +12,7 @@ namespace Fighters.Tests.Common
     {
         public const string DefaultName = "Боец";
 
-        public static Mock<IRace> CreateRaceMock(
+        public static Mock<IRace> CreateRace(
             string name = "Раса",
             int health = 100,
             int damage = 10,
@@ -29,7 +29,7 @@ namespace Fighters.Tests.Common
             return race;
         }
 
-        public static Mock<IFighterClass> CreateClassMock(
+        public static Mock<IFighterClass> CreateClass(
             string name = "Класс",
             int health = 20,
             int damage = 5,
@@ -48,7 +48,7 @@ namespace Fighters.Tests.Common
             return fighterClass;
         }
 
-        public static Mock<IWeapon> CreateWeaponMock(
+        public static Mock<IWeapon> CreateWeapon(
             string name = "Оружие",
             int damage = 7,
             float critChance = 0.05f,
@@ -63,7 +63,7 @@ namespace Fighters.Tests.Common
             return weapon;
         }
 
-        public static Mock<IArmor> CreateArmorMock(
+        public static Mock<IArmor> CreateArmor(
             string name = "Броня",
             int armor = 4,
             int initiative = -2,
@@ -78,22 +78,7 @@ namespace Fighters.Tests.Common
             return armorMock;
         }
 
-        public static Fighter CreateFighter(
-            string name = DefaultName,
-            IRace? race = null,
-            IFighterClass? fighterClass = null,
-            IWeapon? weapon = null,
-            IArmor? armor = null )
-        {
-            return new Fighter(
-                name,
-                race ?? CreateRaceMock().Object,
-                fighterClass ?? CreateClassMock().Object,
-                weapon ?? CreateWeaponMock().Object,
-                armor ?? CreateArmorMock().Object );
-        }
-
-        public static Mock<IFighter> CreateFighterMock(
+        public static Mock<IFighter> CreateFighter(
             string name = DefaultName,
             int maxHealth = 100,
             int currentHealth = 100,
@@ -122,7 +107,7 @@ namespace Fighters.Tests.Common
             return fighter;
         }
 
-        public static Mock<IFighter> CreateFighterMockWithAliveSequence(
+        public static Mock<IFighter> CreateFighterWithAliveSequence(
             string name,
             int initiative,
             params bool[] aliveValues )
@@ -139,6 +124,21 @@ namespace Fighters.Tests.Common
             }
 
             return fighter;
+        }
+
+        public static Fighter CreateRealFighter(
+            string name = DefaultName,
+            IRace? race = null,
+            IFighterClass? fighterClass = null,
+            IWeapon? weapon = null,
+            IArmor? armor = null )
+        {
+            return new Fighter(
+                name,
+                race ?? CreateRace().Object,
+                fighterClass ?? CreateClass().Object,
+                weapon ?? CreateWeapon().Object,
+                armor ?? CreateArmor().Object );
         }
     }
 }

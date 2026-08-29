@@ -12,37 +12,54 @@ namespace Fighters.Tests.Models
         [Fact]
         public void Races_Always_ContainsEveryRaceImplementation()
         {
-            Assert.Contains( FighterCatalog.Races, race => race is Human );
-            Assert.Contains( FighterCatalog.Races, race => race is Orc );
-            Assert.Contains( FighterCatalog.Races, race => race is Vampire );
+            // Act
+            IReadOnlyList<IRace> races = FighterCatalog.Races;
+
+            // Assert
+            Assert.Contains( races, race => race is Human );
+            Assert.Contains( races, race => race is Orc );
+            Assert.Contains( races, race => race is Vampire );
         }
 
         [Fact]
         public void Classes_Always_ContainsEveryClassImplementation()
         {
-            Assert.Contains( FighterCatalog.Classes, fighterClass => fighterClass is Knight );
-            Assert.Contains( FighterCatalog.Classes, fighterClass => fighterClass is Assassin );
+            // Act
+            IReadOnlyList<IFighterClass> classes = FighterCatalog.Classes;
+
+            // Assert
+            Assert.Contains( classes, fighterClass => fighterClass is Knight );
+            Assert.Contains( classes, fighterClass => fighterClass is Assassin );
         }
 
         [Fact]
         public void Weapons_Always_ContainsEveryWeaponImplementation()
         {
-            Assert.Contains( FighterCatalog.Weapons, weapon => weapon is Fists );
-            Assert.Contains( FighterCatalog.Weapons, weapon => weapon is Sword );
-            Assert.Contains( FighterCatalog.Weapons, weapon => weapon is Spear );
+            // Act
+            IReadOnlyList<IWeapon> weapons = FighterCatalog.Weapons;
+
+            // Assert
+            Assert.Contains( weapons, weapon => weapon is Fists );
+            Assert.Contains( weapons, weapon => weapon is Sword );
+            Assert.Contains( weapons, weapon => weapon is Spear );
         }
 
         [Fact]
         public void Armors_Always_ContainsEveryArmorImplementation()
         {
-            Assert.Contains( FighterCatalog.Armors, armor => armor is NoArmor );
-            Assert.Contains( FighterCatalog.Armors, armor => armor is Chainmail );
-            Assert.Contains( FighterCatalog.Armors, armor => armor is Plate );
+            // Act
+            IReadOnlyList<IArmor> armors = FighterCatalog.Armors;
+
+            // Assert
+            Assert.Contains( armors, armor => armor is NoArmor );
+            Assert.Contains( armors, armor => armor is Chainmail );
+            Assert.Contains( armors, armor => armor is Plate );
         }
 
         [Fact]
         public void Catalogs_Always_HaveUniqueNamesInsideEachOfThem()
         {
+            // Act & Assert
             AssertNamesAreUnique( FighterCatalog.Races.Select( race => race.Name ) );
             AssertNamesAreUnique( FighterCatalog.Classes.Select( fighterClass => fighterClass.Name ) );
             AssertNamesAreUnique( FighterCatalog.Weapons.Select( weapon => weapon.Name ) );

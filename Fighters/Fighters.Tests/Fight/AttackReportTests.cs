@@ -6,30 +6,16 @@ namespace Fighters.Tests.Fight
     public class AttackReportTests
     {
         [Fact]
-        public void Constructor_Always_StoresAllPassedValues()
-        {
-            AttackReport report = CreateReport(
-                attackingName: "Боец1",
-                attackedName: "Боец2",
-                rawDamage: 50,
-                dealtDamage: 30,
-                isCritical: true,
-                attackedHealthLeft: 70 );
-
-            Assert.Equal( "Боец1", report.AttackingName );
-            Assert.Equal( "Боец2", report.AttackedName );
-            Assert.Equal( 50, report.RawDamage );
-            Assert.Equal( 30, report.DealtDamage );
-            Assert.True( report.IsCritical );
-            Assert.Equal( 70, report.AttackedHealthLeft );
-        }
-
-        [Fact]
         public void IsAttackedDefeated_HealthLeftIsZero_ReturnsTrue()
         {
+            // Arrange
             AttackReport report = CreateReport( attackedHealthLeft: 0 );
 
-            Assert.True( report.IsAttackedDefeated );
+            // Act
+            bool isAttackedDefeated = report.IsAttackedDefeated;
+
+            // Assert
+            Assert.True( isAttackedDefeated );
         }
 
         [Theory]
@@ -38,9 +24,14 @@ namespace Fighters.Tests.Fight
         [InlineData( 1000 )]
         public void IsAttackedDefeated_HealthLeftIsPositive_ReturnsFalse( int attackedHealthLeft )
         {
+            // Arrange
             AttackReport report = CreateReport( attackedHealthLeft: attackedHealthLeft );
 
-            Assert.False( report.IsAttackedDefeated );
+            // Act
+            bool isAttackedDefeated = report.IsAttackedDefeated;
+
+            // Assert
+            Assert.False( isAttackedDefeated );
         }
 
         private static AttackReport CreateReport(

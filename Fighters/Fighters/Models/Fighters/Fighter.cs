@@ -7,6 +7,8 @@ namespace Fighters.Models.Fighters
 {
     public class Fighter : IFighter
     {
+        public const int MinHealth = 1;
+
         private readonly IRace _race;
         private readonly IFighterClass _class;
         private readonly IWeapon _weapon;
@@ -45,7 +47,7 @@ namespace Fighters.Models.Fighters
 
         public string ArmorName => _armor.Name;
 
-        public int MaxHealth => _race.Health + _class.Health;
+        public int MaxHealth => Math.Max( _race.Health + _class.Health, MinHealth );
 
         public int CurrentHealth => _currentHealth;
 

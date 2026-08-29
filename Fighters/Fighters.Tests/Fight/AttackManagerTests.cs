@@ -15,34 +15,42 @@ namespace Fighters.Tests.Fight
         [Fact]
         public void Constructor_RandomIsNull_ThrowsArgumentNullException()
         {
+            // Act & Assert
             Assert.Throws<ArgumentNullException>( () => new AttackManager( null! ) );
         }
 
         [Fact]
         public void Attack_AttackingIsNull_ThrowsArgumentNullException()
         {
+            // Arrange
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( NoCritRoll, AverageScatterRoll ) );
 
-            Assert.Throws<ArgumentNullException>( () => attackManager.Attack( null!, FighterMock.CreateFighterMock().Object ) );
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>( () => attackManager.Attack( null!, FighterMock.CreateFighter().Object ) );
         }
 
         [Fact]
         public void Attack_AttackedIsNull_ThrowsArgumentNullException()
         {
+            // Arrange
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( NoCritRoll, AverageScatterRoll ) );
 
-            Assert.Throws<ArgumentNullException>( () => attackManager.Attack( FighterMock.CreateFighterMock().Object, null! ) );
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>( () => attackManager.Attack( FighterMock.CreateFighter().Object, null! ) );
         }
 
         [Fact]
         public void Attack_NoCritAndAverageScatter_ReturnsDamageReducedByArmor()
         {
-            Mock<IFighter> attacking = FighterMock.CreateFighterMock( damage: 100, critChance: 0.1f );
-            Mock<IFighter> attacked = FighterMock.CreateFighterMock( armor: 30 );
+            // Arrange
+            Mock<IFighter> attacking = FighterMock.CreateFighter( damage: 100, critChance: 0.1f );
+            Mock<IFighter> attacked = FighterMock.CreateFighter( armor: 30 );
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( NoCritRoll, AverageScatterRoll ) );
 
+            // Act
             AttackResult result = attackManager.Attack( attacking.Object, attacked.Object );
 
+            // Assert
             Assert.Equal( 100, result.RawDamage );
             Assert.Equal( 70, result.DealtDamage );
             Assert.False( result.IsCritical );
@@ -51,12 +59,15 @@ namespace Fighters.Tests.Fight
         [Fact]
         public void Attack_RollIsLessThanCritChance_MultipliesDamageByCritMultiplier()
         {
-            Mock<IFighter> attacking = FighterMock.CreateFighterMock( damage: 100, critChance: 0.2f, critDamageMultiplier: 2f );
-            Mock<IFighter> attacked = FighterMock.CreateFighterMock( armor: 0 );
+            // Arrange
+            Mock<IFighter> attacking = FighterMock.CreateFighter( damage: 100, critChance: 0.2f, critDamageMultiplier: 2f );
+            Mock<IFighter> attacked = FighterMock.CreateFighter( armor: 0 );
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( critRoll: 0.1f, scatterRoll: AverageScatterRoll ) );
 
+            // Act
             AttackResult result = attackManager.Attack( attacking.Object, attacked.Object );
 
+            // Assert
             Assert.True( result.IsCritical );
             Assert.Equal( 200, result.RawDamage );
             Assert.Equal( 200, result.DealtDamage );
@@ -65,11 +76,14 @@ namespace Fighters.Tests.Fight
         [Fact]
         public void Attack_RollEqualsCritChance_IsNotCritical()
         {
-            Mock<IFighter> attacking = FighterMock.CreateFighterMock( damage: 100, critChance: 0.2f, critDamageMultiplier: 2f );
+            // Arrange
+            Mock<IFighter> attacking = FighterMock.CreateFighter( damage: 100, critChance: 0.2f, critDamageMultiplier: 2f );
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( critRoll: 0.2f, scatterRoll: AverageScatterRoll ) );
 
-            AttackResult result = attackManager.Attack( attacking.Object, FighterMock.CreateFighterMock().Object );
+            // Act
+            AttackResult result = attackManager.Attack( attacking.Object, FighterMock.CreateFighter().Object );
 
+            // Assert
             Assert.False( result.IsCritical );
             Assert.Equal( 100, result.RawDamage );
         }
@@ -77,11 +91,14 @@ namespace Fighters.Tests.Fight
         [Fact]
         public void Attack_CritChanceIsZero_IsNeverCriticalEvenOnMinimalRoll()
         {
-            Mock<IFighter> attacking = FighterMock.CreateFighterMock( damage: 100, critChance: 0f, critDamageMultiplier: 2f );
+            // Arrange
+            Mock<IFighter> attacking = FighterMock.CreateFighter( damage: 100, critChance: 0f, critDamageMultiplier: 2f );
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( critRoll: 0f, scatterRoll: AverageScatterRoll ) );
 
-            AttackResult result = attackManager.Attack( attacking.Object, FighterMock.CreateFighterMock().Object );
+            // Act
+            AttackResult result = attackManager.Attack( attacking.Object, FighterMock.CreateFighter().Object );
 
+            // Assert
             Assert.False( result.IsCritical );
             Assert.Equal( 100, result.RawDamage );
         }
@@ -89,11 +106,14 @@ namespace Fighters.Tests.Fight
         [Fact]
         public void Attack_CritChanceIsOne_IsAlwaysCritical()
         {
-            Mock<IFighter> attacking = FighterMock.CreateFighterMock( damage: 100, critChance: 1f, critDamageMultiplier: 2f );
+            // Arrange
+            Mock<IFighter> attacking = FighterMock.CreateFighter( damage: 100, critChance: 1f, critDamageMultiplier: 2f );
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( critRoll: 0.999f, scatterRoll: AverageScatterRoll ) );
 
-            AttackResult result = attackManager.Attack( attacking.Object, FighterMock.CreateFighterMock().Object );
+            // Act
+            AttackResult result = attackManager.Attack( attacking.Object, FighterMock.CreateFighter().Object );
 
+            // Assert
             Assert.True( result.IsCritical );
             Assert.Equal( 200, result.RawDamage );
         }
@@ -101,45 +121,57 @@ namespace Fighters.Tests.Fight
         [Fact]
         public void Attack_MinimalScatterRoll_UsesMinimalScatterMultiplier()
         {
-            Mock<IFighter> attacking = FighterMock.CreateFighterMock( damage: 100 );
+            // Arrange
+            Mock<IFighter> attacking = FighterMock.CreateFighter( damage: 100 );
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( NoCritRoll, scatterRoll: 0f ) );
 
-            AttackResult result = attackManager.Attack( attacking.Object, FighterMock.CreateFighterMock().Object );
+            // Act
+            AttackResult result = attackManager.Attack( attacking.Object, FighterMock.CreateFighter().Object );
 
+            // Assert
             Assert.Equal( 80, result.RawDamage );
         }
 
         [Fact]
         public void Attack_MaximalScatterRoll_UsesMaximalScatterMultiplier()
         {
-            Mock<IFighter> attacking = FighterMock.CreateFighterMock( damage: 100 );
+            // Arrange
+            Mock<IFighter> attacking = FighterMock.CreateFighter( damage: 100 );
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( NoCritRoll, scatterRoll: 1f ) );
 
-            AttackResult result = attackManager.Attack( attacking.Object, FighterMock.CreateFighterMock().Object );
+            // Act
+            AttackResult result = attackManager.Attack( attacking.Object, FighterMock.CreateFighter().Object );
 
+            // Assert
             Assert.Equal( 120, result.RawDamage );
         }
 
         [Fact]
         public void Attack_DamageIsFractional_TruncatesItToWholeNumber()
         {
-            Mock<IFighter> attacking = FighterMock.CreateFighterMock( damage: 10 );
+            // Arrange
+            Mock<IFighter> attacking = FighterMock.CreateFighter( damage: 10 );
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( NoCritRoll, scatterRoll: 0.125f ) );
 
-            AttackResult result = attackManager.Attack( attacking.Object, FighterMock.CreateFighterMock().Object );
+            // Act
+            AttackResult result = attackManager.Attack( attacking.Object, FighterMock.CreateFighter().Object );
 
+            // Assert
             Assert.Equal( 8, result.RawDamage );
         }
 
         [Fact]
         public void Attack_ArmorIsGreaterThanRawDamage_DealtDamageIsZero()
         {
-            Mock<IFighter> attacking = FighterMock.CreateFighterMock( damage: 10 );
-            Mock<IFighter> attacked = FighterMock.CreateFighterMock( armor: 50 );
+            // Arrange
+            Mock<IFighter> attacking = FighterMock.CreateFighter( damage: 10 );
+            Mock<IFighter> attacked = FighterMock.CreateFighter( armor: 50 );
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( NoCritRoll, AverageScatterRoll ) );
 
+            // Act
             AttackResult result = attackManager.Attack( attacking.Object, attacked.Object );
 
+            // Assert
             Assert.Equal( 10, result.RawDamage );
             Assert.Equal( 0, result.DealtDamage );
         }
@@ -147,24 +179,30 @@ namespace Fighters.Tests.Fight
         [Fact]
         public void Attack_ArmorEqualsRawDamage_DealtDamageIsZero()
         {
-            Mock<IFighter> attacking = FighterMock.CreateFighterMock( damage: 10 );
-            Mock<IFighter> attacked = FighterMock.CreateFighterMock( armor: 10 );
+            // Arrange
+            Mock<IFighter> attacking = FighterMock.CreateFighter( damage: 10 );
+            Mock<IFighter> attacked = FighterMock.CreateFighter( armor: 10 );
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( NoCritRoll, AverageScatterRoll ) );
 
+            // Act
             AttackResult result = attackManager.Attack( attacking.Object, attacked.Object );
 
+            // Assert
             Assert.Equal( 0, result.DealtDamage );
         }
 
         [Fact]
         public void Attack_Always_PassesDealtDamageToAttackedFighterOnce()
         {
-            Mock<IFighter> attacking = FighterMock.CreateFighterMock( damage: 100 );
-            Mock<IFighter> attacked = FighterMock.CreateFighterMock( armor: 25 );
+            // Arrange
+            Mock<IFighter> attacking = FighterMock.CreateFighter( damage: 100 );
+            Mock<IFighter> attacked = FighterMock.CreateFighter( armor: 25 );
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( NoCritRoll, AverageScatterRoll ) );
 
+            // Act
             AttackResult result = attackManager.Attack( attacking.Object, attacked.Object );
 
+            // Assert
             attacked.Verify( fighter => fighter.TakeDamage( result.DealtDamage ), Times.Once );
             attacked.Verify( fighter => fighter.TakeDamage( It.IsAny<int>() ), Times.Once );
         }
@@ -172,23 +210,29 @@ namespace Fighters.Tests.Fight
         [Fact]
         public void Attack_Always_DoesNotDamageAttackingFighter()
         {
-            Mock<IFighter> attacking = FighterMock.CreateFighterMock( damage: 100 );
-            Mock<IFighter> attacked = FighterMock.CreateFighterMock();
+            // Arrange
+            Mock<IFighter> attacking = FighterMock.CreateFighter( damage: 100 );
+            Mock<IFighter> attacked = FighterMock.CreateFighter();
             AttackManager attackManager = CreateAttackManager( CreateRandomMock( NoCritRoll, AverageScatterRoll ) );
 
+            // Act
             attackManager.Attack( attacking.Object, attacked.Object );
 
+            // Assert
             attacking.Verify( fighter => fighter.TakeDamage( It.IsAny<int>() ), Times.Never );
         }
 
         [Fact]
         public void Attack_Always_AsksRandomProviderExactlyTwice()
         {
+            // Arrange
             Mock<IRandomProvider> random = CreateRandomMock( NoCritRoll, AverageScatterRoll );
             AttackManager attackManager = CreateAttackManager( random );
 
-            attackManager.Attack( FighterMock.CreateFighterMock().Object, FighterMock.CreateFighterMock().Object );
+            // Act
+            attackManager.Attack( FighterMock.CreateFighter().Object, FighterMock.CreateFighter().Object );
 
+            // Assert
             random.Verify( provider => provider.NextFloat(), Times.Exactly( 2 ) );
         }
 
