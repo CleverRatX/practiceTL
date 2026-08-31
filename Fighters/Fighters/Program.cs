@@ -1,6 +1,7 @@
-﻿using Fighters.Utils;
-using Fighters.ConsoleUi;
+﻿using Fighters.ConsoleUi;
 using Fighters.Fight;
+using Fighters.Models.Fighters;
+using Fighters.Utils;
 
 namespace Fighters
 {
@@ -9,10 +10,14 @@ namespace Fighters
         public static void Main()
         {
             IRandomProvider randomProvider = new RandomProvider();
-            AttackManager attackManager = new( randomProvider );
-            FightManager fightManager = new( attackManager, randomProvider );
+            IAttackManager attackManager = new AttackManager( randomProvider );
+            IFightManager fightManager = new FightManager( attackManager, randomProvider );
 
-            GameApp game = new( fightManager );
+            IConsole console = new SystemConsole();
+            IConsoleInput consoleInput = new ConsoleInput( console );
+            IFighterFactory fighterFactory = new FighterFactory();
+
+            GameApp game = new( fightManager, fighterFactory, consoleInput, console );
             game.Run();
         }
     }

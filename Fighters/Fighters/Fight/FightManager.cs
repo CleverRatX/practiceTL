@@ -3,21 +3,31 @@ using Fighters.Utils;
 
 namespace Fighters.Fight
 {
-    public class FightManager
+    public interface IFightManager
     {
-        private const int MaxRoundsCount = 30;
+        FightReport Fight( IReadOnlyList<IFighter> fighters );
+    }
 
-        private readonly AttackManager _attackManager;
+    public class FightManager : IFightManager
+    {
+        public const int MaxRoundsCount = 30;
+
+        private readonly IAttackManager _attackManager;
         private readonly IRandomProvider _random;
 
-        public FightManager( AttackManager attackManager, IRandomProvider random )
+        public FightManager( IAttackManager attackManager, IRandomProvider random )
         {
+            ArgumentNullException.ThrowIfNull( attackManager );
+            ArgumentNullException.ThrowIfNull( random );
+
             _attackManager = attackManager;
             _random = random;
         }
 
-        public FightReport Fight( List<IFighter> fighters )
+        public FightReport Fight( IReadOnlyList<IFighter> fighters )
         {
+            ArgumentNullException.ThrowIfNull( fighters );
+
             if ( fighters.Count < 2 )
             {
                 throw new ArgumentException( "Для боя нужно минимум два бойца.", nameof( fighters ) );

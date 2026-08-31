@@ -1,30 +1,53 @@
-﻿namespace Fighters.ConsoleUi
+namespace Fighters.ConsoleUi
 {
-    public static class ConsoleInput
+    public interface IConsoleInput
     {
-        public static string ReadString( string title )
-        {
-            Console.WriteLine( title );
+        string ReadString( string title );
 
-            string? input = Console.ReadLine()?.Trim();
+        int ChooseOption( string title, IReadOnlyList<string> options );
+    }
+
+    public class ConsoleInput : IConsoleInput
+    {
+        private readonly IConsole _console;
+
+        public ConsoleInput( IConsole console )
+        {
+            ArgumentNullException.ThrowIfNull( console );
+
+            _console = console;
+        }
+
+        public string ReadString( string title )
+        {
+            _console.WriteLine( title );
+
+            string? input = _console.ReadLine()?.Trim();
 
             while ( string.IsNullOrWhiteSpace( input ) )
             {
-                Console.WriteLine( "Значение не может быть пустым, попробуйте ещё раз:" );
+                _console.WriteLine( "Значение не может быть пустым, попробуйте ещё раз:" );
 
-                input = Console.ReadLine()?.Trim();
+                input = _console.ReadLine()?.Trim();
             }
 
             return input;
         }
 
-        public static int ChooseOption( string title, IReadOnlyList<string> options )
+        public int ChooseOption( string title, IReadOnlyList<string> options )
         {
-            Console.WriteLine( title );
+            ArgumentNullException.ThrowIfNull( options );
+
+            if ( options.Count == 0 )
+            {
+                throw new ArgumentException( "Список вариантов не может быть пустым.", nameof( options ) );
+            }
+
+            _console.WriteLine( title );
 
             for ( int i = 0; i < options.Count; i++ )
             {
-                Console.WriteLine( $"  {i} - {options[ i ]}" );
+                _console.WriteLine( $"  {i} - {options[ i ]}" );
             }
 
             int option = 0;
@@ -32,7 +55,7 @@
 
             while ( isChoosing )
             {
-                string? input = Console.ReadLine()?.Trim();
+                string? input = _console.ReadLine()?.Trim();
 
                 if ( int.TryParse( input, out option ) && option >= 0 && option < options.Count )
                 {
@@ -40,7 +63,7 @@
                 }
                 else
                 {
-                    Console.WriteLine( $"Нужно ввести число от 0 до {options.Count - 1}, попробуйте ещё раз:" );
+                    _console.WriteLine( $"Нужно ввести число от 0 до {options.Count - 1}, попробуйте ещё раз:" );
                 }
             }
 
