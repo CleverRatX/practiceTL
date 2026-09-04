@@ -3,6 +3,7 @@ using Domain.Services;
 using Infrastructure;
 using WebApi;
 using WebApi.Middleware;
+using Microsoft.OpenApi;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder( args );
 
@@ -35,6 +36,18 @@ builder.Services.AddSwaggerGen( options =>
         Title = "ReservationApi",
         Version = "v1",
         Description = "Поиск вариантов размещения, создание, просмотр и отмена бронирований."
+    } );
+
+    options.MapType<TimeOnly>( () => new OpenApiSchema
+    {
+        Type = JsonSchemaType.String,
+        Example = "14:00:00"
+    } );
+
+    options.MapType<TimeOnly?>( () => new OpenApiSchema
+    {
+        Type = JsonSchemaType.String | JsonSchemaType.Null,
+        Example = "12:00:00"
     } );
 } );
 

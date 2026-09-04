@@ -13,6 +13,7 @@ namespace WebApi.Dto.Search
         [Required]
         public DateOnly? DepartureDate { get; set; }
 
+        [Required]
         [Range( 1, 50 )]
         public int Guests { get; set; } = 1;
 

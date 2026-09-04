@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 namespace WebApi.Dto.Reservations
 {
@@ -22,13 +23,16 @@ namespace WebApi.Dto.Reservations
 
         [Required]
         [MaxLength( 200 )]
+        [DefaultValue( "Иванов Иван Иванович" )]
         public string GuestName { get; init; } = string.Empty;
 
         [Required]
         [Phone]
+        [DefaultValue( "+79123456789" )]
         public string GuestPhoneNumber { get; init; } = string.Empty;
 
         [Range( 1, 50 )]
+        [DefaultValue( 1 )]
         public int Guests { get; init; } = 1;
     }
 }

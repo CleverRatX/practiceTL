@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 namespace WebApi.Dto.Properties
 {
@@ -6,14 +7,17 @@ namespace WebApi.Dto.Properties
     {
         [Required]
         [MaxLength( 200 )]
+        [DefaultValue( "Отель" )]
         public string Name { get; init; } = string.Empty;
 
         [Required]
         [MaxLength( 100 )]
+        [DefaultValue( "Россия" )]
         public string Country { get; init; } = string.Empty;
 
         [Required]
         [MaxLength( 100 )]
+        [DefaultValue( "Йошкар-Ола" )]
         public string City { get; init; } = string.Empty;
 
         [Required]
