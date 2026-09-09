@@ -1,65 +1,68 @@
+using Application.Dto;
+using Application.Rules;
 using Domain.Entities;
-using Domain.Models;
-using WebApi.Dto.Reservations;
+using Domain.Repositories;
+using WebApi.Models.Reservations;
 
 namespace WebApi.Mapping
 {
     public static class ReservationMapping
     {
-        private static readonly TimeOnly _defaultArrivalTime = new( 14, 0 );
-        private static readonly TimeOnly _defaultDepartureTime = new( 12, 0 );
-
         public static ReservationResponse ToResponse( this Reservation reservation )
         {
-            return new ReservationResponse(
-                reservation.Id,
-                reservation.PropertyId,
-                reservation.RoomTypeId,
-                reservation.ArrivalDate,
-                reservation.DepartureDate,
-                reservation.ArrivalTime,
-                reservation.DepartureTime,
-                reservation.GuestName,
-                reservation.GuestPhoneNumber,
-                reservation.GuestCount,
-                reservation.Nights,
-                reservation.Total,
-                reservation.Currency,
-                reservation.Status,
-                reservation.CreatedAt,
-                reservation.CancelledAt );
+            return new ReservationResponse
+            {
+                Id = reservation.Id,
+                PropertyId = reservation.PropertyId,
+                RoomTypeId = reservation.RoomTypeId,
+                ArrivalDate = reservation.ArrivalDate,
+                DepartureDate = reservation.DepartureDate,
+                ArrivalTime = reservation.ArrivalTime,
+                DepartureTime = reservation.DepartureTime,
+                GuestName = reservation.GuestName,
+                GuestPhoneNumber = reservation.GuestPhoneNumber,
+                GuestCount = reservation.GuestCount,
+                Nights = BookingRules.CountNights( reservation.ArrivalDate, reservation.DepartureDate ),
+                Total = reservation.Total,
+                Currency = reservation.Currency,
+                Status = reservation.Status,
+                CreatedAt = reservation.CreatedAt,
+                CancelledAt = reservation.CancelledAt
+            };
         }
 
         public static IReadOnlyList<ReservationResponse> ToResponse( this IReadOnlyList<Reservation> reservations )
         {
             return reservations
-                .Select( reservation => reservation.ToResponse() )
+                .Select( ToResponse )
                 .ToList();
         }
 
-        public static NewReservation ToDomain( this CreateReservationRequest request )
+        public static NewReservation ToDto( this CreateReservationRequest request )
         {
-            return new NewReservation(
-                request.PropertyId!.Value,
-                request.RoomTypeId!.Value,
-                request.ArrivalDate!.Value,
-                request.DepartureDate!.Value,
-                request.ArrivalTime ?? _defaultArrivalTime,
-                request.DepartureTime ?? _defaultDepartureTime,
-                request.GuestName,
-                request.GuestPhoneNumber,
-                request.Guests );
+            return new NewReservation
+            {
+                PropertyId = request.PropertyId!.Value,
+                RoomTypeId = request.RoomTypeId!.Value,
+                ArrivalDate = request.ArrivalDate!.Value,
+                DepartureDate = request.DepartureDate!.Value,
+                GuestName = request.GuestName,
+                GuestPhoneNumber = request.GuestPhoneNumber,
+                GuestCount = request.GuestCount
+            };
         }
 
         public static ReservationFilter ToFilter( this ReservationFilterRequest request )
         {
-            return new ReservationFilter(
-                request.PropertyId,
-                request.RoomTypeId,
-                request.GuestName,
-                request.ArrivalDateFrom,
-                request.DepartureDateTo,
-                request.IncludeCancelled );
+            return new ReservationFilter
+            {
+                PropertyId = request.PropertyId,
+                RoomTypeId = request.RoomTypeId,
+                GuestName = request.GuestName,
+                ArrivalDateFrom = request.ArrivalDateFrom,
+                DepartureDateTo = request.DepartureDateTo,
+                IncludeCancelled = request.IncludeCancelled
+            };
         }
     }
 }

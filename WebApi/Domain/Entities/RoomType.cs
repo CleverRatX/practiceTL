@@ -1,26 +1,13 @@
 using Domain.Exceptions;
-using Domain.Models;
 using Domain.Validation;
 
 namespace Domain.Entities
 {
     public class RoomType
     {
-        public RoomType( Guid propertyId, RoomTypeData data )
-            : this( Guid.NewGuid(), propertyId, data )
-        {
-        }
+        public Guid Id { get; private set; }
 
-        public RoomType( Guid id, Guid propertyId, RoomTypeData data )
-        {
-            Id = id;
-            PropertyId = propertyId;
-            SetDetails( data );
-        }
-
-        public Guid Id { get; }
-
-        public Guid PropertyId { get; }
+        public Guid PropertyId { get; private set; }
 
         public string Name { get; private set; } = string.Empty;
 
@@ -38,42 +25,78 @@ namespace Domain.Entities
 
         public IReadOnlyList<string> Amenities { get; private set; } = [];
 
-        public void Update( RoomTypeData data )
+        private RoomType()
         {
-            SetDetails( data );
         }
 
-        public bool FitsGuests( int guestCount )
+        public RoomType(
+            Guid propertyId,
+            string name,
+            decimal dailyPrice,
+            string currency,
+            int minPersonCount,
+            int maxPersonCount,
+            int roomCount,
+            IReadOnlyList<string>? services,
+            IReadOnlyList<string>? amenities )
+            : this(
+                Guid.NewGuid(),
+                propertyId,
+                name,
+                dailyPrice,
+                currency,
+                minPersonCount,
+                maxPersonCount,
+                roomCount,
+                services,
+                amenities )
         {
-            return guestCount >= MinPersonCount && guestCount <= MaxPersonCount;
         }
 
-        public decimal CalculateTotal( int nights )
+        public RoomType(
+            Guid id,
+            Guid propertyId,
+            string name,
+            decimal dailyPrice,
+            string currency,
+            int minPersonCount,
+            int maxPersonCount,
+            int roomCount,
+            IReadOnlyList<string>? services,
+            IReadOnlyList<string>? amenities )
         {
-            if ( nights <= 0 )
-            {
-                throw new DomainValidationException( "Количество ночей должно быть больше нуля." );
-            }
+            Id = id;
+            PropertyId = propertyId;
 
-            return DailyPrice * nights;
+            Update( name, dailyPrice, currency, minPersonCount, maxPersonCount, roomCount, services, amenities );
         }
 
-        private void SetDetails( RoomTypeData data )
+        public void Update(
+            string name,
+            decimal dailyPrice,
+            string currency,
+            int minPersonCount,
+            int maxPersonCount,
+            int roomCount,
+            IReadOnlyList<string>? services,
+            IReadOnlyList<string>? amenities )
         {
-            Name = Validated.Text( data.Name, "Название категории номера не может быть пустым." );
-            DailyPrice = Validated.PositiveAmount( data.DailyPrice, "Цена за ночь должна быть больше нуля." );
-            Currency = Validated.Currency( data.Currency );
-            MinPersonCount = Validated.PositiveCount( data.MinPersonCount, "Минимальное число гостей должно быть больше нуля." );
-            MaxPersonCount = Validated.PositiveCount( data.MaxPersonCount, "Максимальное число гостей должно быть больше нуля." );
-            RoomCount = Validated.PositiveCount( data.RoomCount, "Количество номеров категории должно быть больше нуля." );
+            Name = Validator.NormalizedText( name, "Название категории номера не может быть пустым." );
+            DailyPrice = Validator.Positive( dailyPrice, "Цена за ночь должна быть больше нуля." );
+            Currency = Validator.NormalizedCurrencyCode( currency );
+
+            MinPersonCount = Validator.PositiveCount( minPersonCount, "Минимальное число гостей должно быть больше нуля." );
+            MaxPersonCount = Validator.PositiveCount( maxPersonCount, "Максимальное число гостей должно быть больше нуля." );
 
             if ( MinPersonCount > MaxPersonCount )
             {
                 throw new DomainValidationException( "Минимальное число гостей не может быть больше максимального." );
             }
 
-            Services = data.Services?.ToList() ?? [];
-            Amenities = data.Amenities?.ToList() ?? [];
+            RoomCount = Validator.PositiveCount( roomCount, "Количество номеров категории должно быть больше нуля." );
+
+            Services = services?.ToList() ?? [];
+            Amenities = amenities?.ToList() ?? [];
         }
     }
 }

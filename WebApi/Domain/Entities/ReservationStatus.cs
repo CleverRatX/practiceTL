@@ -2,8 +2,8 @@ namespace Domain.Entities
 {
     public enum ReservationStatus
     {
-        Active = 1,
+        Active = 0,
 
-        Cancelled = 2
+        Cancelled = 1
     }
 }

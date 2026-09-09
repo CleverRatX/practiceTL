@@ -1,57 +1,29 @@
-using System.Text.Json.Serialization;
-using Domain.Services;
-using Infrastructure;
+using Application;
+using Infrastructure.Foundation;
+using Microsoft.EntityFrameworkCore;
 using WebApi;
+using WebApi.Binding;
 using WebApi.Middleware;
-using Microsoft.OpenApi;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder( args );
 
-builder.Services.AddSingleton( TimeProvider.System );
-builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
-builder.Services.AddScoped<IPropertyService, PropertyService>();
-builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
-builder.Services.AddScoped<IReservationService, ReservationService>();
-builder.Services.AddScoped<ISearchService, SearchService>();
-builder.Services.AddInMemoryInfrastructure();
+string connectionString = builder.Configuration.GetConnectionString( "Booking" )
+    ?? throw new InvalidOperationException( "В конфигурации не задана строка подключения \"Booking\"." );
 
 builder.Services
-    .AddControllers()
-    .AddJsonOptions( options =>
-    {
-        options.JsonSerializerOptions.Converters.Add( new JsonStringEnumConverter() );
-    } );
+    .AddApplication()
+    .AddFoundation( connectionString );
 
-builder.Services.AddSwaggerGen( options =>
-{
-    options.SwaggerDoc( ApiDocuments.Properties, new()
-    {
-        Title = "PropertiesApi",
-        Version = "v1",
-        Description = "Управление средствами размещения и категориями номеров."
-    } );
-
-    options.SwaggerDoc( ApiDocuments.Reservations, new()
-    {
-        Title = "ReservationApi",
-        Version = "v1",
-        Description = "Поиск вариантов размещения, создание, просмотр и отмена бронирований."
-    } );
-
-    options.MapType<TimeOnly>( () => new OpenApiSchema
-    {
-        Type = JsonSchemaType.String,
-        Example = "14:00:00"
-    } );
-
-    options.MapType<TimeOnly?>( () => new OpenApiSchema
-    {
-        Type = JsonSchemaType.String | JsonSchemaType.Null,
-        Example = "12:00:00"
-    } );
-} );
+builder.Services.AddApiControllers();
+builder.Services.AddApiDocumentation();
 
 WebApplication app = builder.Build();
+
+using ( IServiceScope scope = app.Services.CreateScope() )
+{
+    BookingDbContext context = scope.ServiceProvider.GetRequiredService<BookingDbContext>();
+    context.Database.Migrate();
+}
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 

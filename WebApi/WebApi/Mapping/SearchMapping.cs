@@ -1,5 +1,5 @@
-using Domain.Models;
-using WebApi.Dto.Search;
+using Application.Dto;
+using WebApi.Models.Search;
 
 namespace WebApi.Mapping
 {
@@ -7,38 +7,42 @@ namespace WebApi.Mapping
     {
         public static SearchCriteria ToCriteria( this SearchRequest request )
         {
-            return new SearchCriteria(
-                request.City,
-                request.ArrivalDate!.Value,
-                request.DepartureDate!.Value,
-                request.Guests,
-                request.MaxPrice );
+            return new SearchCriteria
+            {
+                City = request.City,
+                ArrivalDate = request.ArrivalDate!.Value,
+                DepartureDate = request.DepartureDate!.Value,
+                GuestCount = request.GuestCount,
+                MaxDailyPrice = request.MaxDailyPrice
+            };
         }
 
         public static SearchOptionResponse ToResponse( this SearchResult option )
         {
-            return new SearchOptionResponse(
-                option.Property.Id,
-                option.Property.Name,
-                option.Property.Country,
-                option.Property.City,
-                option.Property.Address,
-                option.RoomType.Id,
-                option.RoomType.Name,
-                option.RoomType.DailyPrice,
-                option.RoomType.MinPersonCount,
-                option.RoomType.MaxPersonCount,
-                option.RoomType.Services,
-                option.RoomType.Amenities,
-                option.Nights,
-                option.Total,
-                option.RoomType.Currency );
+            return new SearchOptionResponse
+            {
+                PropertyId = option.Property.Id,
+                PropertyName = option.Property.Name,
+                Country = option.Property.Country,
+                City = option.Property.City,
+                Address = option.Property.Address,
+                RoomTypeId = option.RoomType.Id,
+                RoomTypeName = option.RoomType.Name,
+                DailyPrice = option.RoomType.DailyPrice,
+                MinPersonCount = option.RoomType.MinPersonCount,
+                MaxPersonCount = option.RoomType.MaxPersonCount,
+                Services = option.RoomType.Services,
+                Amenities = option.RoomType.Amenities,
+                Nights = option.Nights,
+                Total = option.Total,
+                Currency = option.RoomType.Currency
+            };
         }
 
         public static IReadOnlyList<SearchOptionResponse> ToResponse( this IReadOnlyList<SearchResult> options )
         {
             return options
-                .Select( option => option.ToResponse() )
+                .Select( ToResponse )
                 .ToList();
         }
     }

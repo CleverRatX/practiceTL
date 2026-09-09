@@ -1,71 +1,77 @@
 using Domain.Exceptions;
-using Domain.Models;
 using Domain.Validation;
 
 namespace Domain.Entities
 {
     public class Reservation
     {
-        public Reservation( NewReservation request, decimal total, string currency, DateTimeOffset createdAt )
+        public Guid Id { get; private set; }
+
+        public Guid PropertyId { get; private set; }
+
+        public Guid RoomTypeId { get; private set; }
+
+        public DateOnly ArrivalDate { get; private set; }
+
+        public DateOnly DepartureDate { get; private set; }
+
+        public TimeOnly ArrivalTime { get; private set; }
+
+        public TimeOnly DepartureTime { get; private set; }
+
+        public string GuestName { get; private set; } = string.Empty;
+
+        public string GuestPhoneNumber { get; private set; } = string.Empty;
+
+        public int GuestCount { get; private set; }
+
+        public decimal Total { get; private set; }
+
+        public string Currency { get; private set; } = string.Empty;
+
+        public ReservationStatus Status { get; private set; }
+
+        public DateTimeOffset CreatedAt { get; private set; }
+
+        public DateTimeOffset? CancelledAt { get; private set; }
+
+        private Reservation()
         {
-            if ( request.DepartureDate <= request.ArrivalDate )
+        }
+
+        public Reservation(
+            Guid propertyId,
+            Guid roomTypeId,
+            DateOnly arrivalDate,
+            DateOnly departureDate,
+            TimeOnly arrivalTime,
+            TimeOnly departureTime,
+            string guestName,
+            string guestPhoneNumber,
+            int guestCount,
+            decimal total,
+            string currency,
+            DateTimeOffset createdAt )
+        {
+            if ( departureDate <= arrivalDate )
             {
                 throw new DomainValidationException( "Дата выезда должна быть позже даты заезда." );
             }
 
             Id = Guid.NewGuid();
-            PropertyId = request.PropertyId;
-            RoomTypeId = request.RoomTypeId;
-            ArrivalDate = request.ArrivalDate;
-            DepartureDate = request.DepartureDate;
-            ArrivalTime = request.ArrivalTime;
-            DepartureTime = request.DepartureTime;
-            GuestName = Validated.Text( request.GuestName, "ФИО гостя не может быть пустым." );
-            GuestPhoneNumber = Validated.Text( request.GuestPhoneNumber, "Телефон гостя не может быть пустым." );
-            GuestCount = Validated.PositiveCount( request.GuestCount, "Количество гостей должно быть больше нуля." );
-            Total = Validated.NotNegativeAmount( total, "Стоимость бронирования не может быть отрицательной." );
-            Currency = Validated.Currency( currency );
+            PropertyId = propertyId;
+            RoomTypeId = roomTypeId;
+            ArrivalDate = arrivalDate;
+            DepartureDate = departureDate;
+            ArrivalTime = arrivalTime;
+            DepartureTime = departureTime;
+            GuestName = Validator.NormalizedText( guestName, "ФИО гостя не может быть пустым." );
+            GuestPhoneNumber = Validator.NormalizedText( guestPhoneNumber, "Телефон гостя не может быть пустым." );
+            GuestCount = Validator.PositiveCount( guestCount, "Количество гостей должно быть больше нуля." );
+            Total = Validator.NotNegative( total, "Стоимость бронирования не может быть отрицательной." );
+            Currency = Validator.NormalizedCurrencyCode( currency );
             Status = ReservationStatus.Active;
             CreatedAt = createdAt;
-        }
-
-        public Guid Id { get; }
-
-        public Guid PropertyId { get; }
-
-        public Guid RoomTypeId { get; }
-
-        public DateOnly ArrivalDate { get; }
-
-        public DateOnly DepartureDate { get; }
-
-        public TimeOnly ArrivalTime { get; }
-
-        public TimeOnly DepartureTime { get; }
-
-        public string GuestName { get; }
-
-        public string GuestPhoneNumber { get; }
-
-        public int GuestCount { get; }
-
-        public decimal Total { get; }
-
-        public string Currency { get; }
-
-        public ReservationStatus Status { get; private set; }
-
-        public DateTimeOffset CreatedAt { get; }
-
-        public DateTimeOffset? CancelledAt { get; private set; }
-
-        public int Nights => DepartureDate.DayNumber - ArrivalDate.DayNumber;
-
-        public bool IsActive => Status == ReservationStatus.Active;
-
-        public bool CoversNight( DateOnly night )
-        {
-            return night >= ArrivalDate && night < DepartureDate;
         }
 
         public void Cancel( DateTimeOffset cancelledAt )

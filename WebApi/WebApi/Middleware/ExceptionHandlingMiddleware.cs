@@ -1,5 +1,5 @@
 using Domain.Exceptions;
-using Microsoft.AspNetCore.Mvc;
+using WebApi.Models.Errors;
 
 namespace WebApi.Middleware
 {
@@ -22,15 +22,16 @@ namespace WebApi.Middleware
             }
             catch ( DomainException exception )
             {
-                await WriteProblemAsync( context, GetStatusCode( exception ), exception.Message );
+                await WriteErrorAsync( context, GetStatusCode( exception ), GetErrorCode( exception ), exception.Message );
             }
             catch ( Exception exception )
             {
                 _logger.LogError( exception, "Необработанная ошибка при обработке запроса {Path}.", context.Request.Path );
 
-                await WriteProblemAsync(
+                await WriteErrorAsync(
                     context,
                     StatusCodes.Status500InternalServerError,
+                    ErrorCodes.InternalError,
                     "Внутренняя ошибка сервера." );
             }
         }
@@ -46,25 +47,38 @@ namespace WebApi.Middleware
             };
         }
 
-        private static async Task WriteProblemAsync( HttpContext context, int statusCode, string message )
+        private static string GetErrorCode( DomainException exception )
+        {
+            return exception switch
+            {
+                EntityNotFoundException => ErrorCodes.EntityNotFound,
+                ConflictException => ErrorCodes.Conflict,
+                DomainValidationException => ErrorCodes.ValidationError,
+                _ => ErrorCodes.InternalError
+            };
+        }
+
+        private static async Task WriteErrorAsync( HttpContext context, int statusCode, string errorCode, string message )
         {
             if ( context.Response.HasStarted )
             {
                 return;
             }
 
-            ProblemDetails problemDetails = new()
-            {
-                Status = statusCode,
-                Title = message,
-                Instance = context.Request.Path
-            };
+            ErrorResponse[] errors =
+            [
+                new ErrorResponse
+                {
+                    ErrorCode = errorCode,
+                    Message = message
+                }
+            ];
 
             context.Response.Clear();
             context.Response.StatusCode = statusCode;
-            context.Response.ContentType = "application/problem+json";
+            context.Response.ContentType = "application/json";
 
-            await context.Response.WriteAsJsonAsync( problemDetails );
+            await context.Response.WriteAsJsonAsync( errors );
         }
     }
 }

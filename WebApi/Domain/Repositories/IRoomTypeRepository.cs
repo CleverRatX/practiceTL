@@ -2,18 +2,14 @@ using Domain.Entities;
 
 namespace Domain.Repositories
 {
-    public interface IRoomTypeRepository
+    public interface IRoomTypeRepository : IRepository<RoomType>
     {
-        Task<RoomType?> GetByIdAsync( Guid id, CancellationToken cancellationToken );
+        Task<RoomType?> GetByIdAsync( Guid id );
 
-        Task<IReadOnlyList<RoomType>> GetByPropertyIdAsync( Guid propertyId, CancellationToken cancellationToken );
+        Task<RoomType?> GetByIdForUpdateAsync( Guid id );
 
-        Task AddAsync( RoomType roomType, CancellationToken cancellationToken );
+        Task<IReadOnlyList<RoomType>> GetByPropertyIdAsync( Guid propertyId );
 
-        Task UpdateAsync( RoomType roomType, CancellationToken cancellationToken );
-
-        Task DeleteAsync( Guid id, CancellationToken cancellationToken );
-
-        Task DeleteByPropertyIdAsync( Guid propertyId, CancellationToken cancellationToken );
+        Task<IReadOnlyList<RoomType>> GetByPropertyIdsAsync( IReadOnlyList<Guid> propertyIds );
     }
 }

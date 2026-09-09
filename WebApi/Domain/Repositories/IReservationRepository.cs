@@ -1,26 +1,27 @@
 using Domain.Entities;
-using Domain.Models;
 
 namespace Domain.Repositories
 {
-    public interface IReservationRepository
+    public interface IReservationRepository : IRepository<Reservation>
     {
-        Task<Reservation?> GetByIdAsync( Guid id, CancellationToken cancellationToken );
+        Task<Reservation?> GetByIdAsync( Guid id );
 
-        Task<IReadOnlyList<Reservation>> GetAsync( ReservationFilter filter, CancellationToken cancellationToken );
+        Task<IReadOnlyList<Reservation>> GetAsync( ReservationFilter filter );
 
         Task<IReadOnlyList<Reservation>> GetOverlappingAsync(
             Guid roomTypeId,
             DateOnly arrivalDate,
-            DateOnly departureDate,
-            CancellationToken cancellationToken );
+            DateOnly departureDate );
 
-        Task<bool> HasActiveByPropertyAsync( Guid propertyId, CancellationToken cancellationToken );
+        Task<IReadOnlyList<Reservation>> GetOverlappingAsync(
+            IReadOnlyList<Guid> roomTypeIds,
+            DateOnly arrivalDate,
+            DateOnly departureDate );
 
-        Task<bool> HasActiveByRoomTypeAsync( Guid roomTypeId, CancellationToken cancellationToken );
+        Task<IReadOnlyList<Reservation>> GetActiveByRoomTypeIdAsync( Guid roomTypeId, DateOnly fromDate );
 
-        Task AddAsync( Reservation reservation, CancellationToken cancellationToken );
+        Task<bool> HasActiveByPropertyIdAsync( Guid propertyId );
 
-        Task UpdateAsync( Reservation reservation, CancellationToken cancellationToken );
+        Task<bool> HasActiveByRoomTypeIdAsync( Guid roomTypeId );
     }
 }
