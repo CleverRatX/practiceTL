@@ -1,5 +1,5 @@
+using Application.Repositories;
 using Domain.Entities;
-using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Foundation.Repository
@@ -11,16 +11,9 @@ namespace Infrastructure.Foundation.Repository
         {
         }
 
-        public Task<RoomType?> GetByIdAsync( Guid id )
+        public async Task<RoomType?> GetByIdAsync( Guid id )
         {
-            return Entities.FirstOrDefaultAsync( roomType => roomType.Id == id );
-        }
-
-        public Task<RoomType?> GetByIdForUpdateAsync( Guid id )
-        {
-            return Entities
-                .FromSql( $"SELECT * FROM [RoomTypes] WITH (UPDLOCK, ROWLOCK) WHERE [Id] = {id}" )
-                .FirstOrDefaultAsync();
+            return await Entities.FirstOrDefaultAsync( roomType => roomType.Id == id );
         }
 
         public async Task<IReadOnlyList<RoomType>> GetByPropertyIdAsync( Guid propertyId )

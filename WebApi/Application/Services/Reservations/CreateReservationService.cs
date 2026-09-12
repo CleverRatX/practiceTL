@@ -1,29 +1,31 @@
+using System.Data;
 using Application.Dto;
+using Application.Repositories;
 using Application.Rules;
 using Application.Services.Availability;
+using Application.Services.RoomTypes;
 using Domain.Entities;
 using Domain.Exceptions;
-using Domain.Repositories;
 
 namespace Application.Services.Reservations
 {
     public class CreateReservationService : ICreateReservationService
     {
         private readonly IReservationRepository _reservationRepository;
-        private readonly IRoomTypeRepository _roomTypeRepository;
+        private readonly IGetRoomTypeService _getRoomTypeService;
         private readonly IRoomTypeAvailabilityService _roomTypeAvailabilityService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly TimeProvider _timeProvider;
 
         public CreateReservationService(
             IReservationRepository reservationRepository,
-            IRoomTypeRepository roomTypeRepository,
+            IGetRoomTypeService getRoomTypeService,
             IRoomTypeAvailabilityService roomTypeAvailabilityService,
             IUnitOfWork unitOfWork,
             TimeProvider timeProvider )
         {
             _reservationRepository = reservationRepository;
-            _roomTypeRepository = roomTypeRepository;
+            _getRoomTypeService = getRoomTypeService;
             _roomTypeAvailabilityService = roomTypeAvailabilityService;
             _unitOfWork = unitOfWork;
             _timeProvider = timeProvider;
@@ -33,9 +35,9 @@ namespace Application.Services.Reservations
         {
             ValidateDates( request );
 
-            await using ITransaction transaction = await _unitOfWork.BeginTransactionAsync();
+            await using ITransaction transaction = await _unitOfWork.BeginTransactionAsync( IsolationLevel.Serializable );
 
-            RoomType roomType = await LockRoomTypeAsync( request.RoomTypeId );
+            RoomType roomType = await _getRoomTypeService.GetByIdAsync( request.RoomTypeId );
 
             if ( roomType.PropertyId != request.PropertyId )
             {
@@ -81,18 +83,6 @@ namespace Application.Services.Reservations
             await transaction.CommitAsync();
 
             return reservation;
-        }
-
-        private async Task<RoomType> LockRoomTypeAsync( Guid roomTypeId )
-        {
-            RoomType? roomType = await _roomTypeRepository.GetByIdForUpdateAsync( roomTypeId );
-
-            if ( roomType is null )
-            {
-                throw new EntityNotFoundException( $"Категория номера с id: {roomTypeId} не найдена." );
-            }
-
-            return roomType;
         }
 
         private void ValidateDates( NewReservation request )

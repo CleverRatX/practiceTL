@@ -1,5 +1,6 @@
+using Application.Dto;
+using Application.Repositories;
 using Domain.Entities;
-using Domain.Repositories;
 
 namespace Application.Services.Reservations
 {
@@ -12,9 +13,9 @@ namespace Application.Services.Reservations
             _reservationRepository = reservationRepository;
         }
 
-        public Task<IReadOnlyList<Reservation>> GetAsync( ReservationFilter filter )
+        public async Task<IReadOnlyList<Reservation>> GetAsync( ReservationFilter filter )
         {
-            return _reservationRepository.GetAsync( filter );
+            return await _reservationRepository.GetAsync( filter );
         }
     }
 }

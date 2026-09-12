@@ -1,6 +1,6 @@
+using Application.Repositories;
 using Application.Rules;
 using Domain.Entities;
-using Domain.Repositories;
 
 namespace Application.Services.Availability
 {

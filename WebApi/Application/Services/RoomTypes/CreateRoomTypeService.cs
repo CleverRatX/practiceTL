@@ -1,7 +1,7 @@
 using Application.Dto;
+using Application.Repositories;
 using Domain.Entities;
 using Domain.Exceptions;
-using Domain.Repositories;
 
 namespace Application.Services.RoomTypes
 {

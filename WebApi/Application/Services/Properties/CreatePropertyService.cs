@@ -1,6 +1,6 @@
 using Application.Dto;
+using Application.Repositories;
 using Domain.Entities;
-using Domain.Repositories;
 
 namespace Application.Services.Properties
 {

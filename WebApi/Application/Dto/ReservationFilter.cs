@@ -1,4 +1,4 @@
-namespace Domain.Repositories
+namespace Application.Dto
 {
     public class ReservationFilter
     {

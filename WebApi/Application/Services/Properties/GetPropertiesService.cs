@@ -1,5 +1,5 @@
+using Application.Repositories;
 using Domain.Entities;
-using Domain.Repositories;
 
 namespace Application.Services.Properties
 {
@@ -12,9 +12,9 @@ namespace Application.Services.Properties
             _propertyRepository = propertyRepository;
         }
 
-        public Task<IReadOnlyList<Property>> GetAllAsync()
+        public async Task<IReadOnlyList<Property>> GetAllAsync()
         {
-            return _propertyRepository.GetAllAsync();
+            return await _propertyRepository.GetAllAsync();
         }
     }
 }

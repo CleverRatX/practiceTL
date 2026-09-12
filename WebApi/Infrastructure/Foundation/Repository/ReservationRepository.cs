@@ -1,5 +1,6 @@
+using Application.Dto;
+using Application.Repositories;
 using Domain.Entities;
-using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Foundation.Repository
@@ -11,9 +12,9 @@ namespace Infrastructure.Foundation.Repository
         {
         }
 
-        public Task<Reservation?> GetByIdAsync( Guid id )
+        public async Task<Reservation?> GetByIdAsync( Guid id )
         {
-            return Entities.FirstOrDefaultAsync( reservation => reservation.Id == id );
+            return await Entities.FirstOrDefaultAsync( reservation => reservation.Id == id );
         }
 
         public async Task<IReadOnlyList<Reservation>> GetAsync( ReservationFilter filter )
@@ -99,15 +100,15 @@ namespace Infrastructure.Foundation.Repository
                 .ToListAsync();
         }
 
-        public Task<bool> HasActiveByPropertyIdAsync( Guid propertyId )
+        public async Task<bool> HasActiveByPropertyIdAsync( Guid propertyId )
         {
-            return Entities.AnyAsync( reservation => reservation.Status == ReservationStatus.Active
+            return await Entities.AnyAsync( reservation => reservation.Status == ReservationStatus.Active
                 && reservation.PropertyId == propertyId );
         }
 
-        public Task<bool> HasActiveByRoomTypeIdAsync( Guid roomTypeId )
+        public async Task<bool> HasActiveByRoomTypeIdAsync( Guid roomTypeId )
         {
-            return Entities.AnyAsync( reservation => reservation.Status == ReservationStatus.Active
+            return await Entities.AnyAsync( reservation => reservation.Status == ReservationStatus.Active
                 && reservation.RoomTypeId == roomTypeId );
         }
     }

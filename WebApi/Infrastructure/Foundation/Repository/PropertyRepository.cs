@@ -1,5 +1,5 @@
+using Application.Repositories;
 using Domain.Entities;
-using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Foundation.Repository
@@ -19,9 +19,9 @@ namespace Infrastructure.Foundation.Repository
                 .ToListAsync();
         }
 
-        public Task<Property?> GetByIdAsync( Guid id )
+        public async Task<Property?> GetByIdAsync( Guid id )
         {
-            return Entities.FirstOrDefaultAsync( property => property.Id == id );
+            return await Entities.FirstOrDefaultAsync( property => property.Id == id );
         }
 
         public async Task<IReadOnlyList<Property>> GetByCityAsync( string city )
@@ -35,9 +35,9 @@ namespace Infrastructure.Foundation.Repository
                 .ToListAsync();
         }
 
-        public Task<bool> ExistsAsync( Guid id )
+        public async Task<bool> ExistsAsync( Guid id )
         {
-            return Entities.AnyAsync( property => property.Id == id );
+            return await Entities.AnyAsync( property => property.Id == id );
         }
     }
 }

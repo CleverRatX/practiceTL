@@ -1,6 +1,6 @@
 using Domain.Entities;
 
-namespace Domain.Repositories
+namespace Application.Repositories
 {
     public interface IPropertyRepository : IRepository<Property>
     {

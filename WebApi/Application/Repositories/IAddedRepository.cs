@@ -1,4 +1,4 @@
-namespace Domain.Repositories
+namespace Application.Repositories
 {
     public interface IAddedRepository<TEntity>
         where TEntity : class

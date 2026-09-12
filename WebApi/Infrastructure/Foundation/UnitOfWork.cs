@@ -1,4 +1,5 @@
-using Domain.Repositories;
+using System.Data;
+using Application.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -18,9 +19,9 @@ namespace Infrastructure.Foundation
             await _context.SaveChangesAsync();
         }
 
-        public async Task<ITransaction> BeginTransactionAsync()
+        public async Task<ITransaction> BeginTransactionAsync( IsolationLevel isolationLevel )
         {
-            IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+            IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync( isolationLevel );
 
             return new Transaction( transaction );
         }
