@@ -1,6 +1,5 @@
-using Application.Dto;
-using Application.Repositories;
 using Domain.Entities;
+using Domain.Queries;
 
 namespace Application.Services.Reservations
 {

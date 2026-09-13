@@ -4,7 +4,6 @@ using Application.Services.Reservations;
 using Application.Services.RoomTypes;
 using Application.Services.Search;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Application
 {
@@ -15,10 +14,18 @@ namespace Application
             services.AddSingleton( TimeProvider.System );
 
             return services
+                .AddAvailabilityServices()
                 .AddPropertyManagement()
                 .AddRoomTypeManagement()
                 .AddReservationManagement()
                 .AddSearchServices();
+        }
+
+        public static IServiceCollection AddAvailabilityServices( this IServiceCollection services )
+        {
+            services.AddScoped<IRoomTypeAvailabilityService, RoomTypeAvailabilityService>();
+
+            return services;
         }
 
         public static IServiceCollection AddPropertyManagement( this IServiceCollection services )
@@ -45,7 +52,6 @@ namespace Application
 
         public static IServiceCollection AddReservationManagement( this IServiceCollection services )
         {
-            services.TryAddScoped<IRoomTypeAvailabilityService, RoomTypeAvailabilityService>();
             services.AddScoped<IGetReservationsService, GetReservationsService>();
             services.AddScoped<IGetReservationService, GetReservationService>();
             services.AddScoped<ICreateReservationService, CreateReservationService>();
@@ -56,7 +62,6 @@ namespace Application
 
         public static IServiceCollection AddSearchServices( this IServiceCollection services )
         {
-            services.TryAddScoped<IRoomTypeAvailabilityService, RoomTypeAvailabilityService>();
             services.AddScoped<IAccommodationSearchService, AccommodationSearchService>();
 
             return services;

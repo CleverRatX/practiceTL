@@ -1,6 +1,7 @@
 using Application.Dto;
 using Application.Rules;
 using Domain.Entities;
+using Domain.Queries;
 using WebApi.Models.Reservations;
 
 namespace WebApi.Mapping

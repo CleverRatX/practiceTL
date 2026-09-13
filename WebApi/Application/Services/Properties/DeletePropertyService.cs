@@ -1,4 +1,5 @@
-using Application.Repositories;
+using Application.Persistence;
+using Domain.Repositories;
 using Domain.Entities;
 using Domain.Exceptions;
 

@@ -1,7 +1,8 @@
 using System.Data;
 using Application.Dto;
-using Application.Repositories;
+using Domain.Repositories;
 using Application.Rules;
+using Application.Persistence;
 using Application.Services.Availability;
 using Application.Services.RoomTypes;
 using Domain.Entities;

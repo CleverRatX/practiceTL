@@ -1,4 +1,4 @@
-using Application.Repositories;
+using Application.Persistence;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Infrastructure.Foundation

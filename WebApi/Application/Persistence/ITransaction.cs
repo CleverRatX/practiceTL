@@ -1,4 +1,4 @@
-namespace Application.Repositories
+namespace Application.Persistence
 {
     public interface ITransaction : IAsyncDisposable
     {

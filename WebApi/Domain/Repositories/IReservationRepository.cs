@@ -1,7 +1,8 @@
-using Application.Dto;
 using Domain.Entities;
+using Domain.Queries;
+using Domain.Repositories;
 
-namespace Application.Repositories
+namespace Domain.Repositories
 {
     public interface IReservationRepository : IRepository<Reservation>
     {
